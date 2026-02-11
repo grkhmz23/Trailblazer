@@ -4,7 +4,17 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**"]
+      "outputs": [".next/**", "dist/**"],
+      "env": [
+        "DATABASE_URL",
+        "ADMIN_TOKEN",
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_MODEL",
+        "HELIUS_API_KEY",
+        "HELIUS_RPC_URL",
+        "GITHUB_TOKEN",
+        "DEMO_MODE"
+      ]
     },
     "dev": {
       "cache": false,
