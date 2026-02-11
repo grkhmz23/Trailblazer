@@ -4,7 +4,7 @@ AI-powered fortnightly narrative detection for the Solana ecosystem. An autonomo
 
 ---
 
-## Quick Start
+## Quick Start (Local)
 
 ```bash
 # Clone and install
@@ -15,7 +15,7 @@ pnpm install
 # Start PostgreSQL (with pgvector)
 pnpm db:up
 
-# Push schema + seed demo data
+# Push schema + generate client + seed demo data
 pnpm db:push
 pnpm db:generate
 pnpm seed:demo
@@ -25,23 +25,87 @@ pnpm dev
 # → Open http://localhost:3000
 ```
 
-**One command setup:** `pnpm setup` runs all of the above in sequence.
+**One command:** `pnpm setup` runs all of the above in sequence.
 
 ---
 
-## What It Does
+## Deploy to Vercel
 
-Every two weeks, the Narrative Hunter agent:
+### 1. Provision Database
 
-1. **Ingests signals** from onchain transactions (Helius), GitHub activity, and public social sources (RSS, Reddit)
-2. **Scores candidates** using z-score deltas for momentum, novelty bonuses for new entrants, and quality penalties for spam
-3. **Investigates** each top candidate with five specialized tools, recording every step in an explainable trace
-4. **Clusters** candidates into narrative groups using HDBSCAN on semantic embeddings
-5. **Generates summaries** and 3–5 build ideas per narrative using Claude
-6. **Validates markets** with Blue Ocean saturation checks against a 150-project corpus
-7. **Produces Action Packs** (spec.md, tech.md, milestones.md, deps.json) downloadable as zip files
+Use [Neon](https://neon.tech) (recommended) or any Postgres provider:
 
-The result: a dashboard showing what's actually happening in Solana's developer ecosystem — not just what's trending on Twitter.
+1. Create a new Neon project
+2. Enable pgvector extension: `CREATE EXTENSION IF NOT EXISTS vector;`
+3. Copy the connection string
+
+### 2. Deploy to Vercel
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# From repo root:
+vercel
+```
+
+Or connect via Vercel Dashboard:
+1. Import the GitHub repo
+2. Vercel auto-detects the monorepo via `vercel.json`
+3. Root directory: `.` (repo root)
+4. Framework: Next.js (auto-detected)
+
+### 3. Set Environment Variables
+
+In Vercel Dashboard → Settings → Environment Variables:
+
+| Variable | Required | Description |
+|---|---|---|
+| `DATABASE_URL` | ✅ | Neon/Postgres connection string |
+| `ADMIN_TOKEN` | ✅ | Secret token for admin API endpoints |
+| `ANTHROPIC_API_KEY` | For live mode | Claude API key for narrative labeling |
+| `ANTHROPIC_MODEL` | No | Default: `claude-sonnet-4-20250514` |
+| `DEMO_MODE` | No | Default: `true` if no ANTHROPIC_API_KEY |
+| `HELIUS_API_KEY` | No | For live onchain signal ingestion |
+| `GITHUB_TOKEN` | No | For live dev activity signals |
+
+### 4. Push Schema & Seed
+
+```bash
+# From local machine with DATABASE_URL pointed at Neon:
+DATABASE_URL="your-neon-url" pnpm --filter web prisma:push
+DATABASE_URL="your-neon-url" pnpm --filter web seed
+```
+
+### 5. Trigger First Report
+
+```bash
+curl -X POST https://your-app.vercel.app/api/admin/run-fortnight \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+```
+
+### 6. Schedule Recurring Reports
+
+**Option A: GitHub Actions** (recommended)
+
+Set these GitHub Secrets:
+- `VERCEL_DEPLOYMENT_URL` — your Vercel URL (e.g., `https://your-app.vercel.app`)
+- `ADMIN_TOKEN` — same token as in Vercel env
+
+The workflow in `.github/workflows/fortnight.yml` runs on the 1st and 15th of each month.
+
+**Option B: Vercel Cron**
+
+Add to `vercel.json`:
+```json
+{
+  "crons": [{
+    "path": "/api/admin/run-fortnight",
+    "schedule": "0 6 1,15 * *"
+  }]
+}
+```
+Note: Vercel Cron requires Pro plan and the endpoint must handle auth via a shared secret.
 
 ---
 
@@ -52,21 +116,33 @@ solana-narrative-hunter/
 ├── apps/web/              # Next.js 14 dashboard + API routes
 │   ├── src/app/           # Pages: /, /reports, /narratives/[id], /explore
 │   ├── src/components/    # UI: NarrativeCard, InvestigationTrace, IdeaCard, etc.
-│   ├── src/lib/           # Prisma client, utilities
+│   ├── src/lib/           # Core libraries:
+│   │   ├── config.ts      # Typed config loader
+│   │   ├── prisma.ts      # Prisma client singleton
+│   │   ├── llm/           # Anthropic Claude integration + demo fallback
+│   │   └── pipeline/      # Node.js lite worker (Vercel-compatible)
+│   │       ├── index.ts   # Pipeline orchestrator
+│   │       ├── scoring.ts # Z-score + momentum + novelty + quality
+│   │       ├── clustering.ts # Agglomerative clustering + saturation
+│   │       └── ingest.ts  # Signal ingestion from fixtures/APIs
 │   ├── prisma/            # Schema (PostgreSQL + pgvector)
 │   └── scripts/seed.ts    # Demo data seeder
-├── worker/                # Python agent pipeline
-│   ├── run_fortnight.py   # Main pipeline orchestrator
-│   ├── scoring.py         # Z-score + momentum + novelty + quality
-│   ├── clustering.py      # HDBSCAN clustering + saturation scoring
-│   ├── tools/             # 5 investigation tools
-│   ├── db.py              # Database operations (psycopg2)
-│   └── config.py          # Environment + constants
+├── worker/                # Python agent pipeline (local dev only)
 ├── packages/shared/       # Shared TypeScript types
 ├── fixtures/              # Demo signals, embeddings, project corpus
-├── docker-compose.yml     # PostgreSQL + pgvector
+├── docker-compose.yml     # PostgreSQL + pgvector (local dev)
+├── vercel.json            # Vercel deployment config
 └── .github/workflows/     # Scheduled fortnightly runs
 ```
+
+### Two Worker Paths
+
+| Path | Environment | Description |
+|---|---|---|
+| **Node.js Lite** (`apps/web/src/lib/pipeline/`) | Vercel, any Node.js host | Runs in-process via API route. No Python needed. |
+| **Python Full** (`worker/run_fortnight.py`) | Local dev, GitHub Actions with Docker | Full HDBSCAN clustering, sentence-transformers embeddings. |
+
+The Node.js lite pipeline uses agglomerative clustering with cosine similarity — no native dependencies.
 
 ### Data Flow
 
@@ -77,15 +153,17 @@ Scoring (z-scores → momentum + novelty − quality_penalty)
   ↓
 Top K Selection
   ↓
-Investigation (5 tools × K candidates → InvestigationSteps)
+Clustering (agglomerative or HDBSCAN)
   ↓
-Clustering (HDBSCAN on embeddings → narrative groups)
+Narrative Labeling (Claude LLM or demo fallback)
   ↓
-LLM Generation (title + summary + ideas + action packs)
+Idea Generation (3-5 per narrative)
   ↓
-Saturation Check (cosine similarity to 150-project corpus)
+Action Packs (spec.md, tech.md, milestones.md, deps.json)
   ↓
-Database + JSON Export + Dashboard
+Saturation Check (cosine similarity vs 150-project corpus)
+  ↓
+Persist to DB + Dashboard
 ```
 
 ---
@@ -93,224 +171,89 @@ Database + JSON Export + Dashboard
 ## Scoring Formula
 
 ### Momentum Score
+Weighted sum of z-score deltas across three signal categories:
 
-Weighted sum of z-score features across three signal dimensions:
+**Onchain** (70% weight): `z_tx_count(0.25) + z_unique_wallets(0.20) + z_new_wallet_share(0.15) + z_retention(0.10)`
 
-| Metric | Weight | Source |
-|--------|--------|--------|
-| z_tx_count | 0.25 | Onchain |
-| z_unique_wallets | 0.20 | Onchain |
-| z_new_wallet_share | 0.15 | Onchain |
-| z_retention | 0.10 | Onchain |
-| z_commits | 0.20 | Dev |
-| z_stars_delta | 0.15 | Dev |
-| z_new_contributors | 0.10 | Dev |
-| z_releases | 0.05 | Dev |
-| z_mentions_delta | 0.15 | Social |
-| z_unique_authors | 0.10 | Social |
-| z_engagement_delta | 0.10 | Social |
+**Dev** (50% weight): `z_commits(0.20) + z_stars_delta(0.15) + z_new_contributors(0.10) + z_releases(0.05)`
 
-Z-scores are clamped to [-5, 5] to prevent outlier domination:
-
-```
-z_metric = (current - baseline) / max(baseline, ε)
-momentum = Σ(weight_i × clamp(z_i, -5, 5))
-```
+**Social** (35% weight): `z_mentions_delta(0.15) + z_unique_authors(0.10) + z_engagement_delta(0.10)`
 
 ### Novelty Bonus
-
-Linear decay over 60 days from first observation:
-
-```
-novelty = 1.3 × max(0, 1 - age_days / 60)
-```
+Linear decay from 1.3× to 1.0× over 60 days since `first_seen`.
 
 ### Quality Penalty
+- Single-wallet spike (txs up, wallets flat): 0.6× penalty
+- Hype-only social (>80% hype snippets): 0.7× penalty
 
-Multiplied (not added) to detect noise:
-
-- **Single-wallet spike**: If z_new_wallet_share > 2.0 AND z_retention < 0.0 → penalty × 0.5
-- **Hype-only social**: If hype snippets > 80% of total → penalty × 0.5
-
-```
-total_score = max(0, (momentum + novelty) × quality_penalty)
-```
-
----
-
-## Investigation Tools
-
-Each tool writes an `InvestigationStep` record with: tool name, input JSON, output summary, and evidence links.
-
-| Tool | Purpose | Live Source | Demo Mode |
-|------|---------|-------------|-----------|
-| `repo_inspector` | README, commits, releases, stars/forks | GitHub API | Pre-built summaries |
-| `idl_differ` | Semantic diff of IDL/interface changes | Git tag diff | Demo diffs for tracked protocols |
-| `dependency_tracker` | Crate/package adoption acceleration | Cargo.toml / package.json analysis | Pre-built adoption data |
-| `social_pain_finder` | Classify snippets: pain/question/hype/announcement | RSS + Reddit | Demo from signal fixtures |
-| `competitor_search` | Blue Ocean saturation check | Cosine similarity to corpus | Same (works with demo embeddings) |
+### Total Score
+`(momentum × novelty_multiplier) × quality_penalty`
 
 ---
 
 ## Clustering
 
-Candidates are embedded (384-dim sentence-transformers, or precomputed in demo mode) and clustered using **HDBSCAN** (with DBSCAN fallback):
+The Node.js pipeline uses **agglomerative clustering** with average-linkage and cosine similarity:
+1. Compute pairwise cosine similarity between candidate embeddings
+2. Iteratively merge most similar clusters above threshold (0.45)
+3. Stop at max_clusters (10) or when no pair exceeds threshold
 
-- Metric: cosine distance
-- `min_cluster_size`: 2
-- Noise points become singleton clusters
-- Each cluster becomes a narrative
-
-### Saturation Scoring
-
-For each build idea, the system finds the top-3 nearest neighbors in the 150-project ecosystem corpus:
-
-- **Low** (avg similarity < 0.45): Blue Ocean — few competitors
-- **Medium** (0.45–0.75): Active space — differentiation needed
-- **High** (> 0.75): Crowded — pivot suggestion generated
-
----
-
-## Dashboard
-
-### Routes
-
-| Route | Description |
-|-------|-------------|
-| `/` | Latest fortnight report with narrative cards |
-| `/reports` | All reports list |
-| `/reports/[id]` | Report detail with narrative breakdown |
-| `/narratives/[id]` | Full narrative page: summary, scores, investigation trace, evidence, build ideas |
-| `/explore` | Search entities and narratives |
-
-### API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/reports/latest` | Latest completed report |
-| GET | `/api/reports` | All reports |
-| GET | `/api/reports/:id` | Report detail |
-| GET | `/api/narratives/:id` | Narrative with evidence + ideas |
-| GET | `/api/ideas/:id/action-pack.zip` | Download Action Pack as zip |
-| GET | `/api/explore?q=keyword` | Search entities + narratives |
-| POST | `/api/admin/run-fortnight` | Trigger worker (requires `ADMIN_TOKEN`) |
+The Python pipeline uses **HDBSCAN** for density-based clustering with similar semantics.
 
 ---
 
 ## Demo Mode
 
-Runs fully without external API keys. When `DEMO_MODE=true` (or no keys are set):
+When no API keys are set (or `DEMO_MODE=true`), the system:
+- Loads signals from `fixtures/demo_signals.json` (20 entities)
+- Uses precomputed embeddings from `fixtures/demo_embeddings.json`
+- Generates narratives with template-based labels (no LLM call)
+- Checks saturation against `fixtures/projects.json` (150 Solana projects)
 
-- Loads `fixtures/demo_signals.json` (20 entities with realistic onchain/dev/social metrics)
-- Uses `fixtures/demo_embeddings.json` (precomputed 384-dim vectors)
-- Investigation tools return pre-built summaries
-- LLM generation falls back to curated demo narratives and ideas
-
-The `pnpm seed:demo` command populates the database with a complete demo report, so the dashboard is never empty on first visit.
+The dashboard is fully functional in demo mode — all features work.
 
 ---
 
-## Production Setup
+## API Reference
 
-### Environment Variables
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/api/reports/latest` | — | Latest completed report with narratives |
+| GET | `/api/reports` | — | All reports |
+| GET | `/api/reports/:id` | — | Report detail |
+| GET | `/api/narratives/:id` | — | Narrative with evidence + ideas |
+| GET | `/api/ideas/:id/action-pack.zip` | — | Download Action Pack as zip |
+| GET | `/api/explore?q=...` | — | Search entities + narratives |
+| POST | `/api/admin/run-fortnight` | Bearer token | Trigger pipeline (rate-limited) |
 
-Copy `.env.example` to `.env` and configure:
+---
+
+## Commands
 
 ```bash
-# Required
-DATABASE_URL="postgresql://hunter:hunter@localhost:5433/narrative_hunter"
-
-# Optional — enables live mode
-ANTHROPIC_API_KEY=sk-ant-...      # Claude for summaries + ideas
-HELIUS_API_KEY=...                 # Solana onchain data
-GITHUB_TOKEN=ghp_...              # GitHub API (higher rate limits)
-OPENAI_API_KEY=sk-...             # Embeddings (or use sentence-transformers)
-
-# Security
-ADMIN_TOKEN=your-secret-token     # Protects /api/admin/run-fortnight
-```
-
-### Running the Worker
-
-```bash
-# Manual run (last 14 days)
-pnpm worker:run
-
-# Custom period
-cd worker && python3 run_fortnight.py --start 2025-01-01 --end 2025-01-15
-```
-
-### Scheduled Runs (GitHub Actions)
-
-The `.github/workflows/fortnight.yml` runs on the 1st and 15th of each month. Configure these secrets in your GitHub repository:
-
-- `DATABASE_URL` — Production Postgres URL
-- `ANTHROPIC_API_KEY` — Claude API key
-- `HELIUS_API_KEY` — Helius API key
-- `GH_PAT` — GitHub personal access token
-
----
-
-## Data Sources & Terms of Service
-
-| Source | Access Method | ToS Notes |
-|--------|--------------|-----------|
-| GitHub | REST API v3 | Public repos, respects rate limits (60/hr unauthenticated, 5000/hr with token) |
-| Helius | Enhanced Transactions API | Requires API key, pay-per-use |
-| Reddit | Public web (no API key needed) | Public subreddit data only |
-| RSS/Blogs | Standard RSS feeds | Public content |
-| X/Twitter | Official API v2 only | Only if `TWITTER_BEARER_TOKEN` provided |
-| Discord | Bot API only | Only if `DISCORD_BOT_TOKEN` + channel allowlist provided |
-
-**No scraping of private or rate-limited endpoints.** The system degrades gracefully: if a source is unavailable, it falls back to demo data or skips that signal dimension.
-
----
-
-## Database Schema
-
-```
-Report ─┬── Candidate ──── Entity
-        └── Narrative ─┬── NarrativeEvidence
-                       ├── InvestigationStep
-                       └── Idea (with action_pack_files_json)
-```
-
-See `apps/web/prisma/schema.prisma` for the complete schema. Embeddings are stored as `Float[]` columns (pgvector is available via raw SQL for similarity queries).
-
----
-
-## Development
-
-```bash
-# Install all dependencies
-pnpm install
-
-# Start database
-pnpm db:up
-
-# Apply schema changes
-pnpm db:push
-
-# Run in development
-pnpm dev
-
-# Run worker pipeline
-pnpm worker:run
-
-# Format code
-pnpm format
-```
-
-### Python Worker
-
-```bash
-cd worker
-pip install -r requirements.txt
-python3 run_fortnight.py
+pnpm setup              # Full setup: install + DB + migrate + seed
+pnpm dev                # Start dev server
+pnpm build              # Production build
+pnpm lint               # ESLint
+pnpm typecheck          # TypeScript check
+pnpm seed:demo          # Seed demo report
+pnpm db:up              # Start PostgreSQL container
+pnpm db:push            # Push Prisma schema
+pnpm db:generate        # Generate Prisma client
+pnpm worker:run         # Run Python pipeline (local)
 ```
 
 ---
 
-## License
+## Data Sources & ToS Compliance
 
-MIT
+| Source | Access Method | Notes |
+|---|---|---|
+| Solana onchain | Helius API (optional) | Requires API key; free tier available |
+| GitHub | Public API | Unauthenticated: 60 req/hr; with token: 5000 req/hr |
+| RSS/Blogs | Public feeds | No auth needed |
+| Reddit | Public API | Rate-limited; optional OAuth for higher limits |
+| Discord | **NOT scraped** unless user provides bot token + channel allowlist |
+| X/Twitter | Official API only (optional) | Bearer token required |
+
+All data collection respects rate limits with exponential backoff.

@@ -1,0 +1,11 @@
+
+node_modules
+node_modules
+# Environment secrets
+.env
+apps/web/.env
+# Build artifacts
+.next/
+__pycache__/
+*.pyc
+tsconfig.tsbuildinfo

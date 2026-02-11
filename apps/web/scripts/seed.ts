@@ -376,10 +376,36 @@ async function seed() {
   // Load demo signals for entity creation
   let signals: Signal[] = [];
   try {
-    signals = loadFixture<Signal[]>("demo_signals.json");
+    const raw = loadFixture<Record<string, unknown>>("demo_signals.json");
+    // Fixture has {entities: [...], signals: {onchain: [...], dev: [...], social: [...]}}
+    if (raw && typeof raw === "object" && "entities" in raw) {
+      const entities = raw.entities as Array<Record<string, unknown>>;
+      const sigData = raw.signals as Record<string, Array<Record<string, unknown>>>;
+      const onchainMap = new Map((sigData?.onchain || []).map((s) => [s.entity_key as string, s]));
+      const devMap = new Map((sigData?.dev || []).map((s) => [s.entity_key as string, s]));
+      const socialMap = new Map((sigData?.social || []).map((s) => [s.entity_key as string, s]));
+
+      signals = entities.map((ent) => {
+        const key = ent.key as string;
+        const oc = onchainMap.get(key) || {};
+        const dv = devMap.get(key) || {};
+        const sc = socialMap.get(key) || {};
+        return {
+          key,
+          label: ent.label as string,
+          kind: ent.kind as string,
+          first_seen: ent.first_seen as string,
+          onchain: Object.fromEntries(Object.entries(oc).filter(([k]) => k !== "entity_key")) as Record<string, number>,
+          dev: Object.fromEntries(Object.entries(dv).filter(([k]) => k !== "entity_key")) as Record<string, number>,
+          social: Object.fromEntries(Object.entries(sc).filter(([k]) => k !== "entity_key")) as Record<string, unknown>,
+        };
+      });
+    } else if (Array.isArray(raw)) {
+      signals = raw as unknown as Signal[];
+    }
     console.log(`  Loaded ${signals.length} demo signals`);
-  } catch {
-    console.warn("  ⚠ No demo_signals.json found, using inline data");
+  } catch (e) {
+    console.warn("  ⚠ Could not load demo_signals.json:", e);
   }
 
   // Create report

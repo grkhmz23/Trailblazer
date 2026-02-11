@@ -99,15 +99,34 @@ def ingest_signals() -> list[dict]:
     """Load signals from fixtures (demo) or live APIs."""
     log.info("Step 1: Ingesting signals...")
 
-    if DEMO_MODE:
-        signals = load_fixture("demo_signals.json")
-        log.info(f"  Loaded {len(signals)} demo signals")
-        return signals
+    raw = load_fixture("demo_signals.json")
 
-    # Live mode: would fetch from Helius, GitHub, social APIs
-    # For now, live mode still uses demo signals as scaffold
-    log.warning("  Live API ingestion not configured — falling back to demo signals")
-    return load_fixture("demo_signals.json")
+    # The fixture has {entities: [...], signals: {onchain: [...], dev: [...], social: [...]}}
+    # Merge into a flat list: [{key, label, kind, first_seen, onchain, dev, social}, ...]
+    if isinstance(raw, dict) and "entities" in raw:
+        entities = {e["key"]: e for e in raw["entities"]}
+        sig_onchain = {s["entity_key"]: s for s in raw.get("signals", {}).get("onchain", [])}
+        sig_dev = {s["entity_key"]: s for s in raw.get("signals", {}).get("dev", [])}
+        sig_social = {s["entity_key"]: s for s in raw.get("signals", {}).get("social", [])}
+
+        signals = []
+        for key, ent in entities.items():
+            merged = {**ent}
+            oc = sig_onchain.get(key, {})
+            merged["onchain"] = {k: v for k, v in oc.items() if k != "entity_key"}
+            dv = sig_dev.get(key, {})
+            merged["dev"] = {k: v for k, v in dv.items() if k != "entity_key"}
+            sc = sig_social.get(key, {})
+            merged["social"] = {k: v for k, v in sc.items() if k != "entity_key"}
+            signals.append(merged)
+        log.info(f"  Loaded {len(signals)} demo signals (merged from fixture)")
+        return signals
+    elif isinstance(raw, list):
+        log.info(f"  Loaded {len(raw)} demo signals")
+        return raw
+    else:
+        log.error("  Unexpected fixture format")
+        return []
 
 
 # ═══════════════════════════════════════════════════════════

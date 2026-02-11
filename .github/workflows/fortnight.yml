@@ -1,0 +1,50 @@
+name: Fortnightly Narrative Report
+
+on:
+  # Run on the 1st and 15th of each month at 06:00 UTC
+  schedule:
+    - cron: "0 6 1,15 * *"
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+env:
+  VERCEL_URL: ${{ secrets.VERCEL_DEPLOYMENT_URL }}
+  ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+
+jobs:
+  trigger-report:
+    name: Trigger Fortnightly Report via API
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Validate secrets
+        run: |
+          if [ -z "$VERCEL_URL" ] || [ -z "$ADMIN_TOKEN" ]; then
+            echo "❌ Missing required secrets: VERCEL_DEPLOYMENT_URL and/or ADMIN_TOKEN"
+            echo "Set these in Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+          echo "✅ Secrets configured"
+
+      - name: Trigger pipeline
+        run: |
+          echo "Calling $VERCEL_URL/api/admin/run-fortnight..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            "$VERCEL_URL/api/admin/run-fortnight" \
+            -H "Authorization: Bearer $ADMIN_TOKEN" \
+            -H "Content-Type: application/json" \
+            --max-time 300)
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "Status: $HTTP_CODE"
+          echo "Response: $BODY"
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✅ Pipeline completed successfully"
+          else
+            echo "❌ Pipeline failed with status $HTTP_CODE"
+            exit 1
+          fi

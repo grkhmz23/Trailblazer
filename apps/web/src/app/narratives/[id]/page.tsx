@@ -4,7 +4,6 @@ import { InvestigationTrace } from "@/components/narrative/investigation-trace";
 import { EvidenceList } from "@/components/narrative/evidence-list";
 import { IdeaCard } from "@/components/narrative/idea-card";
 import { ScoreChip } from "@/components/ui/score-chip";
-import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -34,7 +33,7 @@ export default async function NarrativeDetailPage({ params }: Props) {
     inputJson: s.inputJson as Record<string, unknown>,
     outputSummary: s.outputSummary,
     linksJson: s.linksJson as string[],
-    createdAt: s.createdAt.toISOString(),
+    createdAt: new Date(s.createdAt).toISOString(),
   }));
 
   const evidenceData = narrative.evidence.map((e) => ({

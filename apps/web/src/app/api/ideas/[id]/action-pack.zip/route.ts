@@ -3,7 +3,18 @@ import { prisma } from "@/lib/prisma";
 import archiver from "archiver";
 import { PassThrough } from "stream";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/** Sanitize folder/file names to prevent zip-slip and invalid chars */
+function sanitizeName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/\.\./g, "") // prevent path traversal
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+}
 
 export async function GET(
   _req: Request,
@@ -41,14 +52,15 @@ export async function GET(
 
     archive.pipe(passThrough);
 
-    const folderName = idea.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    const folderName = sanitizeName(idea.title);
 
     for (const [filename, content] of Object.entries(actionPackFiles)) {
       if (typeof content === "string") {
-        archive.append(content, { name: `${folderName}/${filename}` });
+        const safeName = sanitizeName(
+          filename.replace(/\.[^.]+$/, "")
+        );
+        const ext = filename.includes(".") ? filename.slice(filename.lastIndexOf(".")) : "";
+        archive.append(content, { name: `${folderName}/${safeName}${ext}` });
       }
     }
 

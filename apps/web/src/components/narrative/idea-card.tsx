@@ -1,6 +1,7 @@
 "use client";
 
-import { Download, Target, Users, Clock, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { Download, Loader2, Target, Users, Clock, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { saturationColor } from "@/lib/utils";
@@ -21,8 +22,41 @@ interface IdeaProps {
   pivot: string;
 }
 
+function safeUrl(url: string): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url, "https://example.com");
+    if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+      return url;
+    }
+  } catch {
+    // malformed URL — skip
+  }
+  return null;
+}
+
 export function IdeaCard({ idea }: { idea: IdeaProps }) {
+  const [downloading, setDownloading] = useState(false);
   const sat = idea.saturationJson;
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const res = await fetch(`/api/ideas/${idea.id}/action-pack.zip`);
+      if (!res.ok) throw new Error("Download failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${idea.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-action-pack.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Download error:", e);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <Card className="space-y-4">
@@ -31,13 +65,18 @@ export function IdeaCard({ idea }: { idea: IdeaProps }) {
           <h4 className="text-base font-semibold">{idea.title}</h4>
           <p className="mt-1 text-sm text-muted-foreground">{idea.pitch}</p>
         </div>
-        <a
-          href={`/api/ideas/${idea.id}/action-pack.zip`}
-          className="flex flex-shrink-0 items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+        <button
+          onClick={handleDownload}
+          disabled={downloading}
+          className="flex flex-shrink-0 items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
         >
-          <Download className="h-3.5 w-3.5" />
-          Action Pack
-        </a>
+          {downloading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Download className="h-3.5 w-3.5" />
+          )}
+          {downloading ? "Downloading..." : "Action Pack"}
+        </button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -72,51 +111,54 @@ export function IdeaCard({ idea }: { idea: IdeaProps }) {
       </div>
 
       {/* Saturation / Blue Ocean */}
-      <div className="rounded-lg border border-border bg-muted/30 p-3">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="text-xs font-medium">Market Saturation</span>
-          <Badge
-            className={saturationColor(sat.level)}
-          >
-            {sat.level.toUpperCase()} ({(sat.score * 100).toFixed(0)}%)
-          </Badge>
+      {sat && (
+        <div className="rounded-lg border border-border bg-muted/30 p-3">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-xs font-medium">Market Saturation</span>
+            <Badge className={saturationColor(sat.level)}>
+              {sat.level?.toUpperCase()} ({((sat.score ?? 0) * 100).toFixed(0)}%)
+            </Badge>
+          </div>
+
+          {sat.neighbors && sat.neighbors.length > 0 && (
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground">
+                Nearest competitors:
+              </span>
+              {sat.neighbors.map((n, i) => {
+                const href = safeUrl(n.url);
+                return (
+                  <div key={i} className="flex items-center gap-2 text-xs">
+                    <span className="text-foreground/70">{n.name}</span>
+                    <span className="text-muted-foreground">
+                      ({((n.similarity ?? 0) * 100).toFixed(0)}% similar)
+                    </span>
+                    {href && (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        ↗
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {idea.pivot && (
+            <div className="mt-2 border-t border-border pt-2">
+              <span className="text-xs font-medium text-amber-400">
+                Suggested Pivot:
+              </span>
+              <p className="text-xs text-muted-foreground">{idea.pivot}</p>
+            </div>
+          )}
         </div>
-
-        {sat.neighbors && sat.neighbors.length > 0 && (
-          <div className="space-y-1">
-            <span className="text-xs text-muted-foreground">
-              Nearest competitors:
-            </span>
-            {sat.neighbors.map((n, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs">
-                <span className="text-foreground/70">{n.name}</span>
-                <span className="text-muted-foreground">
-                  ({(n.similarity * 100).toFixed(0)}% similar)
-                </span>
-                {n.url && (
-                  <a
-                    href={n.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    ↗
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {idea.pivot && (
-          <div className="mt-2 border-t border-border pt-2">
-            <span className="text-xs font-medium text-amber-400">
-              Suggested Pivot:
-            </span>
-            <p className="text-xs text-muted-foreground">{idea.pivot}</p>
-          </div>
-        )}
-      </div>
+      )}
     </Card>
   );
 }

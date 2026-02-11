@@ -20,6 +20,19 @@ const typeConfig: Record<string, { icon: React.ElementType; variant: "default" |
   dependency: { icon: Package, variant: "default" },
 };
 
+function safeUrl(url: string): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url, "https://example.com");
+    if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+      return url.startsWith("http") ? url : null;
+    }
+  } catch {
+    // malformed
+  }
+  return null;
+}
+
 export function EvidenceList({ evidence }: { evidence: Evidence[] }) {
   if (evidence.length === 0) {
     return (
@@ -32,6 +45,7 @@ export function EvidenceList({ evidence }: { evidence: Evidence[] }) {
       {evidence.map((ev) => {
         const config = typeConfig[ev.type] ?? { icon: Activity, variant: "default" as const };
         const Icon = config.icon;
+        const href = safeUrl(ev.url);
 
         return (
           <div
@@ -50,9 +64,9 @@ export function EvidenceList({ evidence }: { evidence: Evidence[] }) {
                 </p>
               )}
             </div>
-            {ev.url && (
+            {href && (
               <a
-                href={ev.url}
+                href={href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-shrink-0 text-primary hover:text-primary/80"

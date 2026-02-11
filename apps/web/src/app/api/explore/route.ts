@@ -15,8 +15,6 @@ export async function GET(req: Request) {
       );
     }
 
-    const searchTerm = `%${q}%`;
-
     const [entities, narratives] = await Promise.all([
       prisma.entity.findMany({
         where: {
