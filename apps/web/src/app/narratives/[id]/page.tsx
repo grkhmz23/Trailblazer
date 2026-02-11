@@ -36,7 +36,7 @@ export default async function NarrativeDetailPage({ params }: Props) {
     createdAt: new Date(s.createdAt).toISOString(),
   }));
 
-  const evidenceData = narrative.evidence.map((e) => ({
+  const evidenceData = narrative.evidence.map((e: any) => ({
     id: e.id,
     type: e.type,
     title: e.title,
