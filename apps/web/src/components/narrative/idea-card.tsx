@@ -125,7 +125,7 @@ export function IdeaCard({ idea }: { idea: IdeaProps }) {
               <span className="text-xs text-muted-foreground">
                 Nearest competitors:
               </span>
-              {sat.neighbors.map((n, i) => {
+              {sat.neighbors.map((n: any, i: any) => {
                 const href = safeUrl(n.url);
                 return (
                   <div key={i} className="flex items-center gap-2 text-xs">

@@ -95,7 +95,7 @@ export function HomeControls({
         </p>
       ) : (
         <div className="space-y-4">
-          {filtered.map((narrative, index) => (
+          {filtered.map((narrative: any, index: any) => (
             <NarrativeCard
               key={narrative.id}
               id={narrative.id}

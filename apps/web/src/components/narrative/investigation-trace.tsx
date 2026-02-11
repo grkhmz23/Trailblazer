@@ -42,7 +42,7 @@ export function InvestigationTrace({ steps }: InvestigationTraceProps) {
     <div className="space-y-0">
       {steps
         .sort((a: any, b: any) => a.stepIndex - b.stepIndex)
-        .map((step, i) => (
+        .map((step: any, i: any) => (
           <div key={step.id} className="relative flex gap-4 pb-8 last:pb-0">
             {/* Timeline connector */}
             {i < steps.length - 1 && <div className="timeline-connector" />}
@@ -84,7 +84,7 @@ export function InvestigationTrace({ steps }: InvestigationTraceProps) {
               {/* Evidence links */}
               {Array.isArray(step.linksJson) && step.linksJson.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {(step.linksJson as string[]).map((link, j) => (
+                  {(step.linksJson as string[]).map((link: any, j: any) => (
                     <a
                       key={j}
                       href={link}

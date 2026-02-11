@@ -61,7 +61,7 @@ export default async function ReportDetailPage({ params }: Props) {
       {/* Narratives */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Detected Narratives</h2>
-        {report.narratives.map((narrative, index) => (
+        {report.narratives.map((narrative: any, index: any) => (
           <NarrativeCard
             key={narrative.id}
             id={narrative.id}
