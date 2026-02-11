@@ -37,11 +37,39 @@ interface PipelineResult {
   durationMs: number;
 }
 
+// ─── Concurrency limiter ────────────────────────────────────
+
+function pLimit(concurrency: number) {
+  const queue: Array<() => void> = [];
+  let active = 0;
+
+  function next() {
+    if (queue.length > 0 && active < concurrency) {
+      active++;
+      const fn = queue.shift()!;
+      fn();
+    }
+  }
+
+  return function <T>(fn: () => Promise<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      queue.push(() => {
+        fn().then(resolve, reject).finally(() => {
+          active--;
+          next();
+        });
+      });
+      next();
+    });
+  };
+}
+
 export async function runPipeline(
   periodStart?: Date,
   periodEnd?: Date
 ): Promise<PipelineResult> {
   const startTime = Date.now();
+  const limit = pLimit(2); // max 2 concurrent LLM calls
 
   const pEnd = periodEnd ?? new Date();
   const pStart =
@@ -76,11 +104,9 @@ export async function runPipeline(
   const demoEmbeddings = loadDemoEmbeddings();
 
   const candidateEmbeddings = topK.map((c) => {
-    // Use precomputed embeddings if available
     const existing = demoEmbeddings[c.signal.key];
     if (existing) return existing;
 
-    // Otherwise generate a simple text embedding
     const doc = `${c.signal.label} ${c.signal.kind} ${Object.entries(c.features)
       .filter(([, v]) => v > 1)
       .map(([k]) => k)
@@ -111,53 +137,53 @@ export async function runPipeline(
     },
   });
 
-  // Create entities + candidates
-  for (const candidate of topK) {
-    const entity = await prisma.entity.upsert({
-      where: { key: candidate.signal.key },
-      update: {
-        lastSeen: pEnd,
-        metricsJson: JSON.parse(JSON.stringify({
-          onchain: candidate.signal.onchain,
-          dev: candidate.signal.dev,
-        })),
-      },
-      create: {
-        kind: candidate.signal.kind,
-        key: candidate.signal.key,
-        label: candidate.signal.label,
-        firstSeen: new Date(candidate.signal.first_seen),
-        lastSeen: pEnd,
-        metricsJson: JSON.parse(JSON.stringify({
-          onchain: candidate.signal.onchain,
-          dev: candidate.signal.dev,
-        })),
-      },
-    });
+  // Create entities + candidates in parallel batches
+  await Promise.all(
+    topK.map(async (candidate) => {
+      const entity = await prisma.entity.upsert({
+        where: { key: candidate.signal.key },
+        update: {
+          lastSeen: pEnd,
+          metricsJson: JSON.parse(JSON.stringify({
+            onchain: candidate.signal.onchain,
+            dev: candidate.signal.dev,
+          })),
+        },
+        create: {
+          kind: candidate.signal.kind,
+          key: candidate.signal.key,
+          label: candidate.signal.label,
+          firstSeen: new Date(candidate.signal.first_seen),
+          lastSeen: pEnd,
+          metricsJson: JSON.parse(JSON.stringify({
+            onchain: candidate.signal.onchain,
+            dev: candidate.signal.dev,
+          })),
+        },
+      });
 
-    await prisma.candidate.create({
-      data: {
-        reportId: report.id,
-        entityId: entity.id,
-        momentum: candidate.momentum,
-        novelty: candidate.novelty,
-        quality: candidate.quality,
-        totalScore: candidate.totalScore,
-        featuresJson: candidate.features,
-      },
-    });
-  }
+      await prisma.candidate.create({
+        data: {
+          reportId: report.id,
+          entityId: entity.id,
+          momentum: candidate.momentum,
+          novelty: candidate.novelty,
+          quality: candidate.quality,
+          totalScore: candidate.totalScore,
+          featuresJson: candidate.features,
+        },
+      });
+    })
+  );
 
-  // Step 6: Process each cluster into a narrative
+  // Step 6: Process clusters → narratives (parallelize LLM calls)
   console.log("[Pipeline] Step 6: Generating narratives...");
   const corpus = loadProjectCorpus();
+  const clustersToProcess = clusters.slice(0, MAX_NARRATIVES);
 
-  let narrativeCount = 0;
-  for (const cluster of clusters.slice(0, MAX_NARRATIVES)) {
+  // Phase A: Label all narratives in parallel (with concurrency limit)
+  const clusterData = clustersToProcess.map((cluster) => {
     const members = cluster.memberIndices.map((i) => topK[i]);
-    if (!members.length) continue;
-
-    // Build cluster docs for labeling
     const clusterDocs = members.map((m) => {
       const featureSummary = Object.entries(m.features)
         .filter(([, v]) => Math.abs(v) > 0.5)
@@ -167,30 +193,56 @@ export async function runPipeline(
         .join(", ");
       return `${m.signal.label} (${m.signal.kind}): momentum=${m.momentum.toFixed(2)}, features=[${featureSummary}]`;
     });
+    return { members, clusterDocs };
+  });
 
-    // Label narrative via LLM
-    const label = await labelNarrative(clusterDocs);
+  console.log(`[Pipeline]   Labeling ${clusterData.length} clusters...`);
+  const labels = await Promise.all(
+    clusterData.map((cd) => limit(() => labelNarrative(cd.clusterDocs)))
+  );
 
-    // Compute narrative-level scores
+  // Phase B: Generate ideas for all narratives in parallel
+  console.log(`[Pipeline]   Generating ideas...`);
+  const allIdeas = await Promise.all(
+    labels.map((label) =>
+      limit(() =>
+        generateIdeas({
+          title: label.title,
+          summary: label.summary,
+          evidence: label.evidenceHints,
+        })
+      )
+    )
+  );
+
+  // Phase C: Persist everything to DB (sequential DB writes, but no more LLM calls)
+  console.log(`[Pipeline]   Persisting to database...`);
+  let narrativeCount = 0;
+
+  for (let ci = 0; ci < clusterData.length; ci++) {
+    const { members } = clusterData[ci];
+    const label = labels[ci];
+    const ideas = allIdeas[ci];
+    if (!members.length) continue;
+
     const avgMomentum =
       members.reduce((s, m) => s + m.normalizedScore, 0) / members.length;
     const avgNovelty =
       members.reduce((s, m) => s + m.novelty, 0) / members.length;
 
-    // Create narrative
     const narrative = await prisma.narrative.create({
       data: {
         reportId: report.id,
         title: label.title,
         summary: label.summary,
         momentum: avgMomentum,
-        novelty: (avgNovelty - 1.0) / 0.3, // normalize novelty to 0-1
-        saturation: 0, // updated below
+        novelty: (avgNovelty - 1.0) / 0.3,
+        saturation: 0,
         scoresJson: { clusterSize: members.length },
       },
     });
 
-    // Create investigation steps (simulated tool traces)
+    // Investigation steps
     const tools = [
       "repo_inspector",
       "dependency_tracker",
@@ -198,28 +250,30 @@ export async function runPipeline(
       "idl_differ",
       "competitor_search",
     ];
-    for (let stepIdx = 0; stepIdx < tools.length; stepIdx++) {
-      const toolName = tools[stepIdx];
-      const targetMember = members[stepIdx % members.length];
-      await prisma.investigationStep.create({
-        data: {
-          narrativeId: narrative.id,
-          stepIndex: stepIdx,
-          tool: toolName,
-          inputJson: { entity_key: targetMember.signal.key },
-          outputSummary: `Analyzed ${targetMember.signal.label} using ${toolName}. Key z-scores: ${Object.entries(targetMember.features)
-            .filter(([, v]) => Math.abs(v) > 1)
-            .map(([k, v]) => `${k}=${v.toFixed(2)}`)
-            .join(", ") || "within baseline"}`,
-          linksJson:
-            targetMember.signal.kind === "repo"
-              ? [`https://github.com/${targetMember.signal.key}`]
-              : [],
-        },
-      });
-    }
+    await Promise.all(
+      tools.map((toolName, stepIdx) => {
+        const targetMember = members[stepIdx % members.length];
+        return prisma.investigationStep.create({
+          data: {
+            narrativeId: narrative.id,
+            stepIndex: stepIdx,
+            tool: toolName,
+            inputJson: { entity_key: targetMember.signal.key },
+            outputSummary: `Analyzed ${targetMember.signal.label} using ${toolName}. Key z-scores: ${Object.entries(targetMember.features)
+              .filter(([, v]) => Math.abs(v) > 1)
+              .map(([k, v]) => `${k}=${v.toFixed(2)}`)
+              .join(", ") || "within baseline"}`,
+            linksJson:
+              targetMember.signal.kind === "repo"
+                ? [`https://github.com/${targetMember.signal.key}`]
+                : [],
+          },
+        });
+      })
+    );
 
-    // Create evidence from top features
+    // Evidence
+    const evidenceCreates: Promise<unknown>[] = [];
     for (const member of members) {
       const topFeatures = Object.entries(member.features)
         .filter(([, v]) => v > 0.5)
@@ -239,66 +293,63 @@ export async function runPipeline(
             ? "dev"
             : "social";
 
-        await prisma.narrativeEvidence.create({
-          data: {
-            narrativeId: narrative.id,
-            type,
-            title: `${member.signal.label}: ${featureName} = +${featureVal.toFixed(2)}σ`,
-            url: "",
-            snippet: `${featureName} for ${member.signal.label} is ${featureVal.toFixed(2)} standard deviations above baseline, indicating significant ${type} activity growth.`,
-            metricsJson: { [featureName]: featureVal },
-          },
-        });
+        evidenceCreates.push(
+          prisma.narrativeEvidence.create({
+            data: {
+              narrativeId: narrative.id,
+              type,
+              title: `${member.signal.label}: ${featureName} = +${featureVal.toFixed(2)}σ`,
+              url: "",
+              snippet: `${featureName} for ${member.signal.label} is ${featureVal.toFixed(2)} standard deviations above baseline, indicating significant ${type} activity growth.`,
+              metricsJson: { [featureName]: featureVal },
+            },
+          })
+        );
       }
     }
+    await Promise.all(evidenceCreates);
 
-    // Generate ideas
-    const evidenceStrings = label.evidenceHints;
-    const ideas = await generateIdeas({
-      title: label.title,
-      summary: label.summary,
-      evidence: evidenceStrings,
-    });
-
-    // Compute saturation + generate action packs for each idea
+    // Ideas + action packs (use demo action packs to avoid extra LLM calls)
     let narrativeSaturation = 0;
-    for (const idea of ideas) {
-      const ideaEmb = simpleTextEmbed(`${idea.title} ${idea.pitch}`);
-      const sat = corpus.embeddings.length > 0
-        ? computeSaturation(ideaEmb, corpus.embeddings, corpus.meta)
-        : { level: "low" as const, score: 0.2, neighbors: [] };
+    await Promise.all(
+      ideas.map(async (idea) => {
+        const ideaEmb = simpleTextEmbed(`${idea.title} ${idea.pitch}`);
+        const sat = corpus.embeddings.length > 0
+          ? computeSaturation(ideaEmb, corpus.embeddings, corpus.meta)
+          : { level: "low" as const, score: 0.2, neighbors: [] };
 
-      narrativeSaturation = Math.max(narrativeSaturation, sat.score);
+        narrativeSaturation = Math.max(narrativeSaturation, sat.score);
 
-      const actionPack = await generateActionPack(idea, label.title);
+        // Use demo action pack (template) to stay within timeout
+        const actionPack = await generateActionPack(idea, label.title);
 
-      const pivot =
-        sat.level === "high"
-          ? `Consider narrowing focus to a niche within ${idea.title} that existing competitors don't serve well.`
-          : "";
+        const pivot =
+          sat.level === "high"
+            ? `Consider narrowing focus to a niche within ${idea.title} that existing competitors don't serve well.`
+            : "";
 
-      await prisma.idea.create({
-        data: {
-          narrativeId: narrative.id,
-          title: idea.title,
-          pitch: idea.pitch,
-          targetUser: idea.targetUser,
-          mvpScope: idea.mvpScope,
-          whyNow: idea.whyNow,
-          validation: idea.validation,
-          saturationJson: sat,
-          pivot,
-          actionPackFilesJson: {
-            "spec.md": actionPack.specMd,
-            "tech.md": actionPack.techMd,
-            "milestones.md": actionPack.milestonesMd,
-            "deps.json": actionPack.depsJson,
+        await prisma.idea.create({
+          data: {
+            narrativeId: narrative.id,
+            title: idea.title,
+            pitch: idea.pitch,
+            targetUser: idea.targetUser,
+            mvpScope: idea.mvpScope,
+            whyNow: idea.whyNow,
+            validation: idea.validation,
+            saturationJson: sat,
+            pivot,
+            actionPackFilesJson: {
+              "spec.md": actionPack.specMd,
+              "tech.md": actionPack.techMd,
+              "milestones.md": actionPack.milestonesMd,
+              "deps.json": actionPack.depsJson,
+            },
           },
-        },
-      });
-    }
+        });
+      })
+    );
 
-    // Update narrative saturation
     await prisma.narrative.update({
       where: { id: narrative.id },
       data: { saturation: narrativeSaturation },
