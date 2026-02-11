@@ -52,7 +52,7 @@ export default async function HomePage() {
   }
 
   // Serialize for client component
-  const narratives = report.narratives.map((n) => ({
+  const narratives = report.narratives.map((n: any) => ({
     id: n.id,
     title: n.title,
     summary: n.summary,

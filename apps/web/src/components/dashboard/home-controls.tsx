@@ -45,7 +45,7 @@ export function HomeControls({
     }
 
     // Sort
-    items.sort((a, b) => {
+    items.sort((a: any, b: any) => {
       if (sortBy === "saturation") return a[sortBy] - b[sortBy]; // lower is better
       return b[sortBy] - a[sortBy]; // higher is better
     });
@@ -72,7 +72,7 @@ export function HomeControls({
         {/* Sort buttons */}
         <div className="flex items-center gap-1.5">
           <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-          {SORT_OPTIONS.map((opt) => (
+          {SORT_OPTIONS.map((opt: any) => (
             <button
               key={opt.key}
               onClick={() => setSortBy(opt.key)}

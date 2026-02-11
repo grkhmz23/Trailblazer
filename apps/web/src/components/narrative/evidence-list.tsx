@@ -42,7 +42,7 @@ export function EvidenceList({ evidence }: { evidence: Evidence[] }) {
 
   return (
     <div className="space-y-3">
-      {evidence.map((ev) => {
+      {evidence.map((ev: any) => {
         const config = typeConfig[ev.type] ?? { icon: Activity, variant: "default" as const };
         const Icon = config.icon;
         const href = safeUrl(ev.url);

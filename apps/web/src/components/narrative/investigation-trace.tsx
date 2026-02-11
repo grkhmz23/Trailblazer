@@ -41,7 +41,7 @@ export function InvestigationTrace({ steps }: InvestigationTraceProps) {
   return (
     <div className="space-y-0">
       {steps
-        .sort((a, b) => a.stepIndex - b.stepIndex)
+        .sort((a: any, b: any) => a.stepIndex - b.stepIndex)
         .map((step, i) => (
           <div key={step.id} className="relative flex gap-4 pb-8 last:pb-0">
             {/* Timeline connector */}

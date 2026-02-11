@@ -82,7 +82,7 @@ export default function ExplorePage() {
                 Entities ({results.entities.length})
               </h2>
               <div className="space-y-2">
-                {results.entities.map((entity) => (
+                {results.entities.map((entity: any) => (
                   <Card key={entity.id} className="flex items-center gap-3 py-3">
                     <Badge variant="secondary">{entity.kind}</Badge>
                     <span className="font-medium">{entity.label}</span>
@@ -102,7 +102,7 @@ export default function ExplorePage() {
                 Related Narratives ({results.narratives.length})
               </h2>
               <div className="space-y-2">
-                {results.narratives.map((narrative) => (
+                {results.narratives.map((narrative: any) => (
                   <Link
                     key={narrative.id}
                     href={`/narratives/${narrative.id}`}

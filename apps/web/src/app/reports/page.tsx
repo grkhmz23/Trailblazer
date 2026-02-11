@@ -32,7 +32,7 @@ export default async function ReportsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {reports.map((report) => (
+          {reports.map((report: any) => (
             <Link key={report.id} href={`/reports/${report.id}`}>
               <Card className="group flex items-center justify-between transition-all hover:border-primary/30">
                 <div className="flex items-center gap-4">
