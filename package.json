@@ -1,0 +1,25 @@
+{
+  "name": "solana-narrative-hunter",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "db:up": "docker compose up -d postgres",
+    "db:migrate": "pnpm --filter web prisma:migrate",
+    "db:generate": "pnpm --filter web prisma:generate",
+    "db:push": "pnpm --filter web prisma:push",
+    "seed:demo": "pnpm --filter web seed",
+    "worker:run": "cd worker && python3 run_fortnight.py",
+    "setup": "pnpm install && pnpm db:up && sleep 3 && pnpm db:push && pnpm db:generate && pnpm seed:demo",
+    "lint": "pnpm --filter web lint",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.14"
+  },
+  "packageManager": "pnpm@9.1.0",
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}

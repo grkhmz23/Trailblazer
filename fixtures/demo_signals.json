@@ -1,0 +1,415 @@
+{
+  "metadata": {
+    "generated": "2025-02-01T00:00:00Z",
+    "period_start": "2025-01-18T00:00:00Z",
+    "period_end": "2025-02-01T00:00:00Z",
+    "mode": "demo"
+  },
+  "entities": [
+    {
+      "kind": "protocol",
+      "key": "jupiter-perps-v2",
+      "label": "Jupiter Perpetuals V2",
+      "first_seen": "2024-11-15T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "drift-dlob-server",
+      "label": "Drift DLOB Server",
+      "first_seen": "2024-06-01T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "sanctum-infinity",
+      "label": "Sanctum Infinity Pool",
+      "first_seen": "2024-12-01T00:00:00Z"
+    },
+    {
+      "kind": "repo",
+      "key": "solana-program-library/token-2022",
+      "label": "Token Extensions (Token-2022)",
+      "first_seen": "2023-03-01T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "kamino-lending-v2",
+      "label": "Kamino Lending V2",
+      "first_seen": "2024-09-01T00:00:00Z"
+    },
+    {
+      "kind": "keyword",
+      "key": "solana-blinks",
+      "label": "Solana Blinks / Actions",
+      "first_seen": "2024-10-15T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "light-protocol-zk",
+      "label": "Light Protocol (ZK Compression)",
+      "first_seen": "2024-07-01T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "switchboard-randomness-v2",
+      "label": "Switchboard Randomness V2",
+      "first_seen": "2024-12-20T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "helius-das-api",
+      "label": "Helius DAS API / Webhooks",
+      "first_seen": "2024-04-01T00:00:00Z"
+    },
+    {
+      "kind": "repo",
+      "key": "anza-xyz/agave",
+      "label": "Agave Validator Client",
+      "first_seen": "2024-01-01T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "tensor-amm-v2",
+      "label": "Tensor AMM V2",
+      "first_seen": "2024-11-01T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "phoenix-seat-manager",
+      "label": "Phoenix Seat Manager",
+      "first_seen": "2025-01-05T00:00:00Z"
+    },
+    {
+      "kind": "keyword",
+      "key": "solana-mobile-chapter2",
+      "label": "Solana Mobile Chapter 2",
+      "first_seen": "2024-08-01T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "metaplex-core",
+      "label": "Metaplex Core (New NFT Standard)",
+      "first_seen": "2024-05-01T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "pyth-pull-oracle",
+      "label": "Pyth Pull Oracle Model",
+      "first_seen": "2024-03-01T00:00:00Z"
+    },
+    {
+      "kind": "keyword",
+      "key": "firedancer-frankendancer",
+      "label": "Firedancer / Frankendancer",
+      "first_seen": "2024-02-01T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "solana-pay-v2",
+      "label": "Solana Pay V2 (Transaction Requests)",
+      "first_seen": "2024-06-15T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "marginfi-v2-staking",
+      "label": "Marginfi V2 Staking Module",
+      "first_seen": "2024-10-01T00:00:00Z"
+    },
+    {
+      "kind": "repo",
+      "key": "clockwork-xyz/clockwork",
+      "label": "Clockwork Automation",
+      "first_seen": "2023-06-01T00:00:00Z"
+    },
+    {
+      "kind": "protocol",
+      "key": "access-protocol-staking",
+      "label": "Access Protocol Staking",
+      "first_seen": "2024-08-15T00:00:00Z"
+    }
+  ],
+  "signals": {
+    "onchain": [
+      {
+        "entity_key": "jupiter-perps-v2",
+        "tx_count": 1247532,
+        "tx_count_baseline": 423100,
+        "unique_wallets": 89234,
+        "unique_wallets_baseline": 34120,
+        "new_wallet_share": 0.42,
+        "new_wallet_share_baseline": 0.18,
+        "retention_7d": 0.31,
+        "retention_7d_baseline": 0.22
+      },
+      {
+        "entity_key": "drift-dlob-server",
+        "tx_count": 892340,
+        "tx_count_baseline": 567200,
+        "unique_wallets": 45230,
+        "unique_wallets_baseline": 32100,
+        "new_wallet_share": 0.28,
+        "new_wallet_share_baseline": 0.15,
+        "retention_7d": 0.45,
+        "retention_7d_baseline": 0.38
+      },
+      {
+        "entity_key": "sanctum-infinity",
+        "tx_count": 342100,
+        "tx_count_baseline": 45600,
+        "unique_wallets": 67800,
+        "unique_wallets_baseline": 12300,
+        "new_wallet_share": 0.67,
+        "new_wallet_share_baseline": 0.45,
+        "retention_7d": 0.19,
+        "retention_7d_baseline": 0.12
+      },
+      {
+        "entity_key": "light-protocol-zk",
+        "tx_count": 123400,
+        "tx_count_baseline": 34500,
+        "unique_wallets": 23400,
+        "unique_wallets_baseline": 8900,
+        "new_wallet_share": 0.56,
+        "new_wallet_share_baseline": 0.34,
+        "retention_7d": 0.24,
+        "retention_7d_baseline": 0.15
+      },
+      {
+        "entity_key": "kamino-lending-v2",
+        "tx_count": 567800,
+        "tx_count_baseline": 234500,
+        "unique_wallets": 34500,
+        "unique_wallets_baseline": 18900,
+        "new_wallet_share": 0.35,
+        "new_wallet_share_baseline": 0.20,
+        "retention_7d": 0.52,
+        "retention_7d_baseline": 0.41
+      },
+      {
+        "entity_key": "tensor-amm-v2",
+        "tx_count": 234500,
+        "tx_count_baseline": 123400,
+        "unique_wallets": 28900,
+        "unique_wallets_baseline": 19200,
+        "new_wallet_share": 0.31,
+        "new_wallet_share_baseline": 0.22,
+        "retention_7d": 0.38,
+        "retention_7d_baseline": 0.29
+      },
+      {
+        "entity_key": "phoenix-seat-manager",
+        "tx_count": 89200,
+        "tx_count_baseline": 12300,
+        "unique_wallets": 15600,
+        "unique_wallets_baseline": 3400,
+        "new_wallet_share": 0.72,
+        "new_wallet_share_baseline": 0.55,
+        "retention_7d": 0.15,
+        "retention_7d_baseline": 0.08
+      },
+      {
+        "entity_key": "metaplex-core",
+        "tx_count": 456700,
+        "tx_count_baseline": 234500,
+        "unique_wallets": 56700,
+        "unique_wallets_baseline": 34500,
+        "new_wallet_share": 0.38,
+        "new_wallet_share_baseline": 0.25,
+        "retention_7d": 0.28,
+        "retention_7d_baseline": 0.21
+      }
+    ],
+    "dev": [
+      {
+        "entity_key": "jupiter-perps-v2",
+        "commits": 87,
+        "commits_baseline": 34,
+        "stars_delta": 234,
+        "stars_delta_baseline": 45,
+        "new_contributors": 12,
+        "new_contributors_baseline": 3,
+        "releases": 4,
+        "releases_baseline": 1
+      },
+      {
+        "entity_key": "light-protocol-zk",
+        "commits": 156,
+        "commits_baseline": 42,
+        "stars_delta": 567,
+        "stars_delta_baseline": 89,
+        "new_contributors": 18,
+        "new_contributors_baseline": 5,
+        "releases": 3,
+        "releases_baseline": 1
+      },
+      {
+        "entity_key": "sanctum-infinity",
+        "commits": 67,
+        "commits_baseline": 23,
+        "stars_delta": 189,
+        "stars_delta_baseline": 34,
+        "new_contributors": 8,
+        "new_contributors_baseline": 2,
+        "releases": 2,
+        "releases_baseline": 0
+      },
+      {
+        "entity_key": "solana-program-library/token-2022",
+        "commits": 234,
+        "commits_baseline": 89,
+        "stars_delta": 345,
+        "stars_delta_baseline": 67,
+        "new_contributors": 23,
+        "new_contributors_baseline": 8,
+        "releases": 5,
+        "releases_baseline": 2
+      },
+      {
+        "entity_key": "anza-xyz/agave",
+        "commits": 312,
+        "commits_baseline": 189,
+        "stars_delta": 456,
+        "stars_delta_baseline": 123,
+        "new_contributors": 15,
+        "new_contributors_baseline": 7,
+        "releases": 6,
+        "releases_baseline": 3
+      },
+      {
+        "entity_key": "firedancer-frankendancer",
+        "commits": 278,
+        "commits_baseline": 145,
+        "stars_delta": 678,
+        "stars_delta_baseline": 234,
+        "new_contributors": 9,
+        "new_contributors_baseline": 4,
+        "releases": 2,
+        "releases_baseline": 1
+      },
+      {
+        "entity_key": "drift-dlob-server",
+        "commits": 45,
+        "commits_baseline": 32,
+        "stars_delta": 67,
+        "stars_delta_baseline": 23,
+        "new_contributors": 4,
+        "new_contributors_baseline": 2,
+        "releases": 2,
+        "releases_baseline": 1
+      },
+      {
+        "entity_key": "phoenix-seat-manager",
+        "commits": 89,
+        "commits_baseline": 12,
+        "stars_delta": 123,
+        "stars_delta_baseline": 15,
+        "new_contributors": 7,
+        "new_contributors_baseline": 1,
+        "releases": 3,
+        "releases_baseline": 0
+      }
+    ],
+    "social": [
+      {
+        "entity_key": "jupiter-perps-v2",
+        "mentions_count": 1234,
+        "mentions_count_baseline": 456,
+        "unique_authors": 345,
+        "unique_authors_baseline": 123,
+        "engagement_score": 8900,
+        "engagement_score_baseline": 2340,
+        "snippets": [
+          {"text": "Jupiter Perps V2 volume just crossed $2B in a single day. The LP vault yield is insane right now.", "class": "announcement"},
+          {"text": "Having issues with Jupiter Perps V2 partial fills on large orders. Anyone else seeing this?", "class": "pain_point"},
+          {"text": "The new limit order system in Perps V2 is actually game-changing for on-chain trading.", "class": "announcement"},
+          {"text": "How do I integrate Jupiter Perps V2 into my trading bot? The docs seem incomplete.", "class": "question"}
+        ]
+      },
+      {
+        "entity_key": "light-protocol-zk",
+        "mentions_count": 890,
+        "mentions_count_baseline": 123,
+        "unique_authors": 234,
+        "unique_authors_baseline": 56,
+        "engagement_score": 5670,
+        "engagement_score_baseline": 890,
+        "snippets": [
+          {"text": "ZK Compression could reduce state costs by 1000x on Solana. This is the most underrated infra play.", "class": "announcement"},
+          {"text": "Light Protocol's compressed token transfers are working on devnet. Just tested — sub-cent costs.", "class": "announcement"},
+          {"text": "Struggling to understand the Merkle tree invalidation in Light Protocol. Any good resources?", "class": "question"},
+          {"text": "ZK compression is the future of Solana scalability. Light Protocol leading the charge.", "class": "hype"}
+        ]
+      },
+      {
+        "entity_key": "sanctum-infinity",
+        "mentions_count": 567,
+        "mentions_count_baseline": 89,
+        "unique_authors": 189,
+        "unique_authors_baseline": 34,
+        "engagement_score": 3450,
+        "engagement_score_baseline": 456,
+        "snippets": [
+          {"text": "Sanctum Infinity Pool is enabling any LST to be instantly liquid. This solves LST fragmentation.", "class": "announcement"},
+          {"text": "Just staked my SOL through Sanctum and the yield is significantly better than vanilla staking.", "class": "announcement"},
+          {"text": "Why doesn't Sanctum support more exotic LSTs? The permissionless pool should accept everything.", "class": "pain_point"}
+        ]
+      },
+      {
+        "entity_key": "solana-blinks",
+        "mentions_count": 2340,
+        "mentions_count_baseline": 890,
+        "unique_authors": 567,
+        "unique_authors_baseline": 234,
+        "engagement_score": 12300,
+        "engagement_score_baseline": 4560,
+        "snippets": [
+          {"text": "Blinks are bringing Solana transactions to every website. This is the UX breakthrough we needed.", "class": "hype"},
+          {"text": "Built a Blink for my NFT mint — users can mint directly from Twitter. Conversion rate went up 5x.", "class": "announcement"},
+          {"text": "Blink detection by wallets is still inconsistent. Phantom supports it but Backpack doesn't fully.", "class": "pain_point"},
+          {"text": "The Actions spec needs better error handling. Silent failures are killing user experience.", "class": "pain_point"}
+        ]
+      },
+      {
+        "entity_key": "firedancer-frankendancer",
+        "mentions_count": 678,
+        "mentions_count_baseline": 345,
+        "unique_authors": 156,
+        "unique_authors_baseline": 89,
+        "engagement_score": 4560,
+        "engagement_score_baseline": 2340,
+        "snippets": [
+          {"text": "Frankendancer is already running on testnet with 50% better TPS. Mainnet timeline looking good.", "class": "announcement"},
+          {"text": "The Firedancer team at Jump is shipping at an incredible pace. This will transform Solana throughput.", "class": "hype"},
+          {"text": "How will Firedancer affect existing MEV strategies? The new scheduler changes everything.", "class": "question"}
+        ]
+      },
+      {
+        "entity_key": "kamino-lending-v2",
+        "mentions_count": 456,
+        "mentions_count_baseline": 234,
+        "unique_authors": 123,
+        "unique_authors_baseline": 67,
+        "engagement_score": 2890,
+        "engagement_score_baseline": 1230,
+        "snippets": [
+          {"text": "Kamino V2 lending rates are consistently beating Aave on Ethereum. Solana DeFi is maturing.", "class": "announcement"},
+          {"text": "The isolated lending pools in Kamino V2 are exactly what we needed for risk management.", "class": "announcement"},
+          {"text": "Liquidation bot on Kamino V2 keeps getting front-run. Need better MEV protection.", "class": "pain_point"}
+        ]
+      },
+      {
+        "entity_key": "phoenix-seat-manager",
+        "mentions_count": 234,
+        "mentions_count_baseline": 34,
+        "unique_authors": 89,
+        "unique_authors_baseline": 12,
+        "engagement_score": 1560,
+        "engagement_score_baseline": 230,
+        "snippets": [
+          {"text": "Phoenix V2 seat model is brilliant — market makers get priority by staking. Pure on-chain CLOB.", "class": "announcement"},
+          {"text": "How do seat allocations work in Phoenix? Is there a minimum stake for market making?", "class": "question"},
+          {"text": "Phoenix is quietly building the best on-chain orderbook. The seat manager is a competitive moat.", "class": "hype"}
+        ]
+      }
+    ]
+  }
+}

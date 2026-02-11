@@ -1,0 +1,1467 @@
+[
+  {
+    "name": "Jupiter",
+    "description": "Leading DEX aggregator on Solana with limit orders, DCA, and perpetuals trading",
+    "url": "https://jup.ag",
+    "tags": [
+      "defi",
+      "dex",
+      "aggregator",
+      "perps"
+    ]
+  },
+  {
+    "name": "Raydium",
+    "description": "Automated market maker and liquidity provider built on Solana",
+    "url": "https://raydium.io",
+    "tags": [
+      "defi",
+      "amm",
+      "liquidity"
+    ]
+  },
+  {
+    "name": "Marinade Finance",
+    "description": "Liquid staking protocol for Solana with mSOL token",
+    "url": "https://marinade.finance",
+    "tags": [
+      "defi",
+      "staking",
+      "liquid-staking"
+    ]
+  },
+  {
+    "name": "Drift Protocol",
+    "description": "Decentralized perpetual exchange with cross-margin on Solana",
+    "url": "https://drift.trade",
+    "tags": [
+      "defi",
+      "perps",
+      "trading"
+    ]
+  },
+  {
+    "name": "Tensor",
+    "description": "NFT trading platform and AMM for Solana NFTs",
+    "url": "https://tensor.trade",
+    "tags": [
+      "nft",
+      "marketplace",
+      "amm"
+    ]
+  },
+  {
+    "name": "Marginfi",
+    "description": "Decentralized lending and borrowing protocol on Solana",
+    "url": "https://marginfi.com",
+    "tags": [
+      "defi",
+      "lending",
+      "borrowing"
+    ]
+  },
+  {
+    "name": "Phoenix",
+    "description": "On-chain central limit order book DEX on Solana",
+    "url": "https://phoenix.trade",
+    "tags": [
+      "defi",
+      "clob",
+      "orderbook"
+    ]
+  },
+  {
+    "name": "Jito",
+    "description": "MEV infrastructure and liquid staking for Solana validators",
+    "url": "https://jito.network",
+    "tags": [
+      "infrastructure",
+      "mev",
+      "staking"
+    ]
+  },
+  {
+    "name": "Sanctum",
+    "description": "LST infrastructure enabling infinite liquid staking tokens on Solana",
+    "url": "https://sanctum.so",
+    "tags": [
+      "defi",
+      "staking",
+      "lst"
+    ]
+  },
+  {
+    "name": "Kamino Finance",
+    "description": "Automated liquidity and lending vaults on Solana",
+    "url": "https://kamino.finance",
+    "tags": [
+      "defi",
+      "lending",
+      "vaults"
+    ]
+  },
+  {
+    "name": "Metaplex",
+    "description": "NFT standard and tooling protocol for Solana",
+    "url": "https://metaplex.com",
+    "tags": [
+      "nft",
+      "standard",
+      "tooling"
+    ]
+  },
+  {
+    "name": "Magic Eden",
+    "description": "Multi-chain NFT marketplace with Solana focus",
+    "url": "https://magiceden.io",
+    "tags": [
+      "nft",
+      "marketplace"
+    ]
+  },
+  {
+    "name": "Pyth Network",
+    "description": "Oracle network providing real-time market data to Solana programs",
+    "url": "https://pyth.network",
+    "tags": [
+      "infrastructure",
+      "oracle",
+      "data"
+    ]
+  },
+  {
+    "name": "Switchboard",
+    "description": "Decentralized oracle and randomness provider for Solana",
+    "url": "https://switchboard.xyz",
+    "tags": [
+      "infrastructure",
+      "oracle",
+      "randomness"
+    ]
+  },
+  {
+    "name": "Helius",
+    "description": "Solana RPC infrastructure, webhooks, and DAS API provider",
+    "url": "https://helius.dev",
+    "tags": [
+      "infrastructure",
+      "rpc",
+      "api"
+    ]
+  },
+  {
+    "name": "Light Protocol",
+    "description": "ZK compression protocol for Solana reducing state costs",
+    "url": "https://lightprotocol.com",
+    "tags": [
+      "infrastructure",
+      "zk",
+      "compression"
+    ]
+  },
+  {
+    "name": "Squads Protocol",
+    "description": "Multisig and smart account infrastructure for Solana",
+    "url": "https://squads.so",
+    "tags": [
+      "infrastructure",
+      "multisig",
+      "security"
+    ]
+  },
+  {
+    "name": "Orca",
+    "description": "Concentrated liquidity DEX on Solana with Whirlpools",
+    "url": "https://orca.so",
+    "tags": [
+      "defi",
+      "dex",
+      "clmm"
+    ]
+  },
+  {
+    "name": "Solend",
+    "description": "Lending and borrowing protocol on Solana",
+    "url": "https://solend.fi",
+    "tags": [
+      "defi",
+      "lending"
+    ]
+  },
+  {
+    "name": "Phantom",
+    "description": "Leading crypto wallet for Solana with multi-chain support",
+    "url": "https://phantom.app",
+    "tags": [
+      "wallet",
+      "consumer"
+    ]
+  },
+  {
+    "name": "Backpack",
+    "description": "Crypto wallet and exchange built by the Coral team",
+    "url": "https://backpack.app",
+    "tags": [
+      "wallet",
+      "exchange"
+    ]
+  },
+  {
+    "name": "Solflare",
+    "description": "Solana wallet with staking and DeFi integration",
+    "url": "https://solflare.com",
+    "tags": [
+      "wallet",
+      "staking"
+    ]
+  },
+  {
+    "name": "Helium",
+    "description": "Decentralized wireless network migrated to Solana",
+    "url": "https://helium.com",
+    "tags": [
+      "depin",
+      "wireless",
+      "iot"
+    ]
+  },
+  {
+    "name": "Render Network",
+    "description": "Decentralized GPU rendering network on Solana",
+    "url": "https://rendernetwork.com",
+    "tags": [
+      "depin",
+      "compute",
+      "gpu"
+    ]
+  },
+  {
+    "name": "Hivemapper",
+    "description": "Decentralized mapping network built on Solana",
+    "url": "https://hivemapper.com",
+    "tags": [
+      "depin",
+      "mapping"
+    ]
+  },
+  {
+    "name": "Nosana",
+    "description": "Decentralized CI/CD and GPU compute network on Solana",
+    "url": "https://nosana.io",
+    "tags": [
+      "depin",
+      "compute",
+      "ci-cd"
+    ]
+  },
+  {
+    "name": "Dialect",
+    "description": "Smart messaging protocol and notifications for Solana",
+    "url": "https://dialect.to",
+    "tags": [
+      "messaging",
+      "notifications",
+      "social"
+    ]
+  },
+  {
+    "name": "Bonfida",
+    "description": "Solana Name Service and trading tools",
+    "url": "https://bonfida.org",
+    "tags": [
+      "naming",
+      "identity",
+      "trading"
+    ]
+  },
+  {
+    "name": "Wormhole",
+    "description": "Cross-chain messaging and bridge protocol",
+    "url": "https://wormhole.com",
+    "tags": [
+      "bridge",
+      "cross-chain",
+      "messaging"
+    ]
+  },
+  {
+    "name": "deBridge",
+    "description": "Cross-chain trading and bridge infrastructure",
+    "url": "https://debridge.finance",
+    "tags": [
+      "bridge",
+      "cross-chain",
+      "trading"
+    ]
+  },
+  {
+    "name": "Solana Mobile",
+    "description": "Mobile-first Solana ecosystem with Saga phone and dApp Store",
+    "url": "https://solanamobile.com",
+    "tags": [
+      "mobile",
+      "consumer",
+      "hardware"
+    ]
+  },
+  {
+    "name": "Tiplink",
+    "description": "Send crypto to anyone via a link, no wallet needed",
+    "url": "https://tiplink.io",
+    "tags": [
+      "payments",
+      "onboarding",
+      "consumer"
+    ]
+  },
+  {
+    "name": "Sphere",
+    "description": "Crypto payment processing for merchants on Solana",
+    "url": "https://spherepay.co",
+    "tags": [
+      "payments",
+      "merchant"
+    ]
+  },
+  {
+    "name": "Crossmint",
+    "description": "NFT minting and wallet infrastructure API",
+    "url": "https://crossmint.com",
+    "tags": [
+      "nft",
+      "infrastructure",
+      "api"
+    ]
+  },
+  {
+    "name": "Underdog Protocol",
+    "description": "Compressed NFT API and tooling for Solana",
+    "url": "https://underdogprotocol.com",
+    "tags": [
+      "nft",
+      "api",
+      "compression"
+    ]
+  },
+  {
+    "name": "Access Protocol",
+    "description": "Content monetization through token staking",
+    "url": "https://accessprotocol.co",
+    "tags": [
+      "content",
+      "staking",
+      "creator"
+    ]
+  },
+  {
+    "name": "Streamflow",
+    "description": "Token vesting, payroll, and distribution on Solana",
+    "url": "https://streamflow.finance",
+    "tags": [
+      "payments",
+      "vesting",
+      "payroll"
+    ]
+  },
+  {
+    "name": "Clockwork",
+    "description": "On-chain automation and scheduled transactions for Solana",
+    "url": "https://clockwork.xyz",
+    "tags": [
+      "infrastructure",
+      "automation"
+    ]
+  },
+  {
+    "name": "Realms",
+    "description": "DAO governance platform for Solana",
+    "url": "https://realms.today",
+    "tags": [
+      "governance",
+      "dao"
+    ]
+  },
+  {
+    "name": "MonkeDAO",
+    "description": "Community-driven DAO and validator operator on Solana",
+    "url": "https://monkedao.io",
+    "tags": [
+      "dao",
+      "community",
+      "validator"
+    ]
+  },
+  {
+    "name": "Grape Protocol",
+    "description": "Community management and social tooling for Solana",
+    "url": "https://grapeprotocol.com",
+    "tags": [
+      "social",
+      "community",
+      "tooling"
+    ]
+  },
+  {
+    "name": "Parcl",
+    "description": "Synthetic real estate trading protocol on Solana",
+    "url": "https://parcl.co",
+    "tags": [
+      "defi",
+      "real-estate",
+      "synthetics"
+    ]
+  },
+  {
+    "name": "Zeta Markets",
+    "description": "Options and futures DEX on Solana",
+    "url": "https://zeta.markets",
+    "tags": [
+      "defi",
+      "options",
+      "futures"
+    ]
+  },
+  {
+    "name": "Mango Markets",
+    "description": "Decentralized trading platform with margin and perps",
+    "url": "https://mango.markets",
+    "tags": [
+      "defi",
+      "trading",
+      "margin"
+    ]
+  },
+  {
+    "name": "Hubble Protocol",
+    "description": "Borrowing protocol issuing USDH stablecoin on Solana",
+    "url": "https://hubbleprotocol.io",
+    "tags": [
+      "defi",
+      "stablecoin",
+      "borrowing"
+    ]
+  },
+  {
+    "name": "UXD Protocol",
+    "description": "Algorithmic stablecoin backed by delta-neutral positions",
+    "url": "https://uxd.fi",
+    "tags": [
+      "defi",
+      "stablecoin"
+    ]
+  },
+  {
+    "name": "Star Atlas",
+    "description": "AAA space exploration game built on Solana",
+    "url": "https://staratlas.com",
+    "tags": [
+      "gaming",
+      "metaverse"
+    ]
+  },
+  {
+    "name": "Aurory",
+    "description": "Play-to-earn gaming ecosystem on Solana",
+    "url": "https://aurory.io",
+    "tags": [
+      "gaming",
+      "p2e"
+    ]
+  },
+  {
+    "name": "Genopets",
+    "description": "Move-to-earn game combining fitness with gaming on Solana",
+    "url": "https://genopets.me",
+    "tags": [
+      "gaming",
+      "m2e",
+      "fitness"
+    ]
+  },
+  {
+    "name": "Stepn",
+    "description": "Move-to-earn lifestyle app on Solana",
+    "url": "https://stepn.com",
+    "tags": [
+      "consumer",
+      "m2e",
+      "fitness"
+    ]
+  },
+  {
+    "name": "Solana Pay",
+    "description": "Payment protocol for instant Solana transactions at point of sale",
+    "url": "https://solanapay.com",
+    "tags": [
+      "payments",
+      "pos",
+      "merchant"
+    ]
+  },
+  {
+    "name": "Civic",
+    "description": "Identity verification and compliance for Solana dApps",
+    "url": "https://civic.com",
+    "tags": [
+      "identity",
+      "compliance",
+      "kyc"
+    ]
+  },
+  {
+    "name": "Lulo",
+    "description": "Yield aggregator routing deposits to best Solana lending rates",
+    "url": "https://lulo.fi",
+    "tags": [
+      "defi",
+      "yield",
+      "aggregator"
+    ]
+  },
+  {
+    "name": "Save (fka Solend)",
+    "description": "Decentralized saving and lending protocol",
+    "url": "https://save.finance",
+    "tags": [
+      "defi",
+      "lending",
+      "savings"
+    ]
+  },
+  {
+    "name": "Flexlend",
+    "description": "Variable-rate lending aggregator for Solana DeFi",
+    "url": "https://flexlend.fi",
+    "tags": [
+      "defi",
+      "lending",
+      "aggregator"
+    ]
+  },
+  {
+    "name": "Hawksight",
+    "description": "Automated DeFi strategy optimizer on Solana",
+    "url": "https://hawksight.co",
+    "tags": [
+      "defi",
+      "yield",
+      "automation"
+    ]
+  },
+  {
+    "name": "Tulip Protocol",
+    "description": "Yield aggregation vaults for Solana DeFi",
+    "url": "https://tulip.garden",
+    "tags": [
+      "defi",
+      "yield",
+      "vaults"
+    ]
+  },
+  {
+    "name": "Francium",
+    "description": "DeFi yield strategy platform on Solana",
+    "url": "https://francium.io",
+    "tags": [
+      "defi",
+      "yield",
+      "leverage"
+    ]
+  },
+  {
+    "name": "Lifinity",
+    "description": "Proactive market maker DEX on Solana using oracle pricing",
+    "url": "https://lifinity.io",
+    "tags": [
+      "defi",
+      "dex",
+      "oracle-based"
+    ]
+  },
+  {
+    "name": "Saber",
+    "description": "Cross-chain stablecoin exchange on Solana",
+    "url": "https://saber.so",
+    "tags": [
+      "defi",
+      "stablecoin",
+      "exchange"
+    ]
+  },
+  {
+    "name": "Maple Finance",
+    "description": "Institutional lending protocol on Solana",
+    "url": "https://maple.finance",
+    "tags": [
+      "defi",
+      "lending",
+      "institutional"
+    ]
+  },
+  {
+    "name": "Friktion",
+    "description": "DeFi structured products and volatility strategies (sunset)",
+    "url": "https://friktion.fi",
+    "tags": [
+      "defi",
+      "options",
+      "structured"
+    ]
+  },
+  {
+    "name": "GooseFX",
+    "description": "DeFi suite with perps, single-sided liquidity, and NFT exchange",
+    "url": "https://goosefx.io",
+    "tags": [
+      "defi",
+      "perps",
+      "nft"
+    ]
+  },
+  {
+    "name": "Credix",
+    "description": "Private credit and emerging market lending on Solana",
+    "url": "https://credix.finance",
+    "tags": [
+      "defi",
+      "rwa",
+      "credit"
+    ]
+  },
+  {
+    "name": "Hxro Network",
+    "description": "Derivatives liquidity network for Solana",
+    "url": "https://hxro.network",
+    "tags": [
+      "defi",
+      "derivatives",
+      "liquidity"
+    ]
+  },
+  {
+    "name": "Cypher Protocol",
+    "description": "Subaccounts and cross-margined derivatives on Solana",
+    "url": "https://cypher.trade",
+    "tags": [
+      "defi",
+      "derivatives",
+      "margin"
+    ]
+  },
+  {
+    "name": "Solana FM",
+    "description": "Solana blockchain explorer and analytics platform",
+    "url": "https://solana.fm",
+    "tags": [
+      "analytics",
+      "explorer"
+    ]
+  },
+  {
+    "name": "Step Finance",
+    "description": "Portfolio management dashboard for Solana DeFi",
+    "url": "https://step.finance",
+    "tags": [
+      "analytics",
+      "portfolio"
+    ]
+  },
+  {
+    "name": "Birdeye",
+    "description": "Multi-chain DeFi analytics and token trading",
+    "url": "https://birdeye.so",
+    "tags": [
+      "analytics",
+      "trading"
+    ]
+  },
+  {
+    "name": "DexScreener",
+    "description": "Real-time DEX trading analytics and charts",
+    "url": "https://dexscreener.com",
+    "tags": [
+      "analytics",
+      "charts"
+    ]
+  },
+  {
+    "name": "Flipside Crypto",
+    "description": "Blockchain analytics platform with Solana data",
+    "url": "https://flipsidecrypto.xyz",
+    "tags": [
+      "analytics",
+      "data"
+    ]
+  },
+  {
+    "name": "Triton One",
+    "description": "Dedicated Solana RPC infrastructure provider",
+    "url": "https://triton.one",
+    "tags": [
+      "infrastructure",
+      "rpc"
+    ]
+  },
+  {
+    "name": "GenesysGo",
+    "description": "Solana infrastructure with Shadow Drive storage",
+    "url": "https://genesysgo.com",
+    "tags": [
+      "infrastructure",
+      "storage"
+    ]
+  },
+  {
+    "name": "Ironforge",
+    "description": "Solana RPC and developer tools platform",
+    "url": "https://ironforge.cloud",
+    "tags": [
+      "infrastructure",
+      "rpc",
+      "developer"
+    ]
+  },
+  {
+    "name": "QuickNode",
+    "description": "Multi-chain node infrastructure with Solana support",
+    "url": "https://quicknode.com",
+    "tags": [
+      "infrastructure",
+      "rpc"
+    ]
+  },
+  {
+    "name": "Alchemy",
+    "description": "Web3 development platform with Solana APIs",
+    "url": "https://alchemy.com",
+    "tags": [
+      "infrastructure",
+      "api",
+      "developer"
+    ]
+  },
+  {
+    "name": "Shyft",
+    "description": "Solana API infrastructure for builders",
+    "url": "https://shyft.to",
+    "tags": [
+      "infrastructure",
+      "api"
+    ]
+  },
+  {
+    "name": "Hello Moon",
+    "description": "Solana data analytics and API platform",
+    "url": "https://hellomoon.io",
+    "tags": [
+      "analytics",
+      "api",
+      "data"
+    ]
+  },
+  {
+    "name": "Xray",
+    "description": "Human-readable Solana transaction explorer",
+    "url": "https://xray.helius.xyz",
+    "tags": [
+      "explorer",
+      "ux"
+    ]
+  },
+  {
+    "name": "Shadow Protocol",
+    "description": "Decentralized storage network on Solana",
+    "url": "https://shadow.cloud",
+    "tags": [
+      "infrastructure",
+      "storage",
+      "depin"
+    ]
+  },
+  {
+    "name": "Teleport",
+    "description": "Decentralized ride-sharing protocol on Solana",
+    "url": "https://teleport.xyz",
+    "tags": [
+      "depin",
+      "rideshare",
+      "consumer"
+    ]
+  },
+  {
+    "name": "Solana Actions",
+    "description": "Transaction specification for embedding Solana txs anywhere",
+    "url": "https://solana.com/solutions/actions",
+    "tags": [
+      "standard",
+      "ux",
+      "transactions"
+    ]
+  },
+  {
+    "name": "Compressed NFTs",
+    "description": "State compression for minting millions of NFTs cheaply",
+    "url": "https://solana.com/solutions/compressed-nfts",
+    "tags": [
+      "nft",
+      "compression",
+      "standard"
+    ]
+  },
+  {
+    "name": "Token Extensions",
+    "description": "Token-2022 program with transfer hooks, confidential transfers, metadata",
+    "url": "https://spl.solana.com/token-2022",
+    "tags": [
+      "standard",
+      "token",
+      "extensions"
+    ]
+  },
+  {
+    "name": "Firedancer",
+    "description": "Independent Solana validator client by Jump Crypto written in C",
+    "url": "https://jumpcrypto.com/firedancer",
+    "tags": [
+      "infrastructure",
+      "validator",
+      "performance"
+    ]
+  },
+  {
+    "name": "Anchor",
+    "description": "Framework for Solana program development in Rust",
+    "url": "https://anchor-lang.com",
+    "tags": [
+      "developer",
+      "framework",
+      "rust"
+    ]
+  },
+  {
+    "name": "Seahorse",
+    "description": "Python-to-Solana program compiler using Anchor",
+    "url": "https://seahorse-lang.org",
+    "tags": [
+      "developer",
+      "python",
+      "framework"
+    ]
+  },
+  {
+    "name": "Solana Playground",
+    "description": "Browser-based IDE for Solana program development",
+    "url": "https://beta.solpg.io",
+    "tags": [
+      "developer",
+      "ide",
+      "tooling"
+    ]
+  },
+  {
+    "name": "Neon EVM",
+    "description": "EVM compatibility layer running on Solana",
+    "url": "https://neon-labs.org",
+    "tags": [
+      "infrastructure",
+      "evm",
+      "compatibility"
+    ]
+  },
+  {
+    "name": "Eclipse",
+    "description": "Ethereum L2 powered by Solana Virtual Machine",
+    "url": "https://eclipse.xyz",
+    "tags": [
+      "infrastructure",
+      "l2",
+      "svm"
+    ]
+  },
+  {
+    "name": "Sonic SVM",
+    "description": "Gaming-focused chain built on Solana Virtual Machine",
+    "url": "https://sonic.game",
+    "tags": [
+      "gaming",
+      "svm",
+      "chain"
+    ]
+  },
+  {
+    "name": "Grass",
+    "description": "Decentralized web scraping network rewarding bandwidth sharing",
+    "url": "https://grassio.com",
+    "tags": [
+      "depin",
+      "data",
+      "ai"
+    ]
+  },
+  {
+    "name": "io.net",
+    "description": "Decentralized GPU compute network for AI/ML workloads",
+    "url": "https://io.net",
+    "tags": [
+      "depin",
+      "compute",
+      "ai"
+    ]
+  },
+  {
+    "name": "Mayan Finance",
+    "description": "Cross-chain swap protocol with Wormhole integration",
+    "url": "https://mayan.finance",
+    "tags": [
+      "bridge",
+      "cross-chain",
+      "swap"
+    ]
+  },
+  {
+    "name": "Allbridge",
+    "description": "Cross-chain bridge supporting Solana transfers",
+    "url": "https://allbridge.io",
+    "tags": [
+      "bridge",
+      "cross-chain"
+    ]
+  },
+  {
+    "name": "Lulo Finance",
+    "description": "Best-rate deposit routing across Solana lending protocols",
+    "url": "https://lulo.fi",
+    "tags": [
+      "defi",
+      "yield",
+      "routing"
+    ]
+  },
+  {
+    "name": "Mean Finance",
+    "description": "DCA protocol and treasury management on Solana",
+    "url": "https://meanfi.com",
+    "tags": [
+      "defi",
+      "dca",
+      "treasury"
+    ]
+  },
+  {
+    "name": "Turbine",
+    "description": "Block propagation protocol in Solana validator architecture",
+    "url": "https://docs.solana.com/cluster/turbine-block-propagation",
+    "tags": [
+      "infrastructure",
+      "protocol",
+      "networking"
+    ]
+  },
+  {
+    "name": "Saga Phone",
+    "description": "Android mobile device with Solana integration and dApp Store",
+    "url": "https://solanamobile.com",
+    "tags": [
+      "mobile",
+      "hardware",
+      "consumer"
+    ]
+  },
+  {
+    "name": "Drip Haus",
+    "description": "Free NFT distribution platform for creators on Solana",
+    "url": "https://drip.haus",
+    "tags": [
+      "nft",
+      "creator",
+      "distribution"
+    ]
+  },
+  {
+    "name": "Exchange Art",
+    "description": "Curated art marketplace on Solana for 1/1 pieces",
+    "url": "https://exchange.art",
+    "tags": [
+      "nft",
+      "art",
+      "marketplace"
+    ]
+  },
+  {
+    "name": "FormFunction",
+    "description": "Creator-first NFT marketplace on Solana",
+    "url": "https://formfunction.xyz",
+    "tags": [
+      "nft",
+      "creator",
+      "marketplace"
+    ]
+  },
+  {
+    "name": "Cardinal",
+    "description": "NFT staking and utility infrastructure for Solana",
+    "url": "https://cardinal.so",
+    "tags": [
+      "nft",
+      "staking",
+      "infrastructure"
+    ]
+  },
+  {
+    "name": "Sharky",
+    "description": "NFT-backed lending protocol on Solana",
+    "url": "https://sharky.fi",
+    "tags": [
+      "nft",
+      "lending",
+      "defi"
+    ]
+  },
+  {
+    "name": "Rainfi",
+    "description": "NFT lending and collateral protocol",
+    "url": "https://rain.fi",
+    "tags": [
+      "nft",
+      "lending"
+    ]
+  },
+  {
+    "name": "Honeyland",
+    "description": "Strategy game combining DeFi mechanics with gaming",
+    "url": "https://honey.land",
+    "tags": [
+      "gaming",
+      "strategy"
+    ]
+  },
+  {
+    "name": "Zeebit",
+    "description": "On-chain casino and gaming platform on Solana",
+    "url": "https://zeebit.io",
+    "tags": [
+      "gaming",
+      "casino"
+    ]
+  },
+  {
+    "name": "BetDEX",
+    "description": "Decentralized sports betting exchange on Solana",
+    "url": "https://betdex.com",
+    "tags": [
+      "gaming",
+      "betting",
+      "sports"
+    ]
+  },
+  {
+    "name": "Dual Finance",
+    "description": "Options-based staking rewards on Solana",
+    "url": "https://dual.finance",
+    "tags": [
+      "defi",
+      "options",
+      "staking"
+    ]
+  },
+  {
+    "name": "Marinade Native",
+    "description": "Native staking solution without liquid token dependency",
+    "url": "https://marinade.finance/native",
+    "tags": [
+      "staking",
+      "native",
+      "validator"
+    ]
+  },
+  {
+    "name": "Blaze Stake",
+    "description": "Community-run liquid staking pool supporting small validators",
+    "url": "https://stake.solblaze.org",
+    "tags": [
+      "staking",
+      "liquid-staking",
+      "decentralization"
+    ]
+  },
+  {
+    "name": "mrgn",
+    "description": "Suite of DeFi products including lending and LST",
+    "url": "https://mrgn.group",
+    "tags": [
+      "defi",
+      "lending",
+      "suite"
+    ]
+  },
+  {
+    "name": "Hubble",
+    "description": "CDP protocol minting USDH against multiple Solana assets",
+    "url": "https://hubbleprotocol.io",
+    "tags": [
+      "defi",
+      "stablecoin",
+      "cdp"
+    ]
+  },
+  {
+    "name": "Kin",
+    "description": "Consumer-facing cryptocurrency for apps on Solana",
+    "url": "https://kin.org",
+    "tags": [
+      "token",
+      "consumer",
+      "ecosystem"
+    ]
+  },
+  {
+    "name": "Bonk",
+    "description": "Community dog-themed token on Solana with wide ecosystem integration",
+    "url": "https://bonkcoin.com",
+    "tags": [
+      "meme",
+      "community",
+      "token"
+    ]
+  },
+  {
+    "name": "WEN",
+    "description": "Community token launched via Jupiter LFG launchpad",
+    "url": "https://wenwencoin.com",
+    "tags": [
+      "meme",
+      "community",
+      "launchpad"
+    ]
+  },
+  {
+    "name": "Pump.fun",
+    "description": "Token launchpad for creating and trading memecoins on Solana",
+    "url": "https://pump.fun",
+    "tags": [
+      "launchpad",
+      "meme",
+      "trading"
+    ]
+  },
+  {
+    "name": "Moonshot",
+    "description": "Simple memecoin trading app by DEX Screener team",
+    "url": "https://moonshot.money",
+    "tags": [
+      "trading",
+      "meme",
+      "consumer"
+    ]
+  },
+  {
+    "name": "Raydium LaunchLab",
+    "description": "Fair launch platform for new Solana tokens",
+    "url": "https://raydium.io/launchpad",
+    "tags": [
+      "launchpad",
+      "defi"
+    ]
+  },
+  {
+    "name": "Armada",
+    "description": "Token launch and staking infrastructure for Solana projects",
+    "url": "https://armadafi.so",
+    "tags": [
+      "launchpad",
+      "staking",
+      "infrastructure"
+    ]
+  },
+  {
+    "name": "Symmetry",
+    "description": "On-chain fund management and token baskets",
+    "url": "https://symmetry.fi",
+    "tags": [
+      "defi",
+      "funds",
+      "indices"
+    ]
+  },
+  {
+    "name": "Saros",
+    "description": "DeFi super-app with swap, farming, and staking",
+    "url": "https://saros.finance",
+    "tags": [
+      "defi",
+      "super-app"
+    ]
+  },
+  {
+    "name": "Cega",
+    "description": "Exotic derivatives and structured products protocol",
+    "url": "https://cega.fi",
+    "tags": [
+      "defi",
+      "derivatives",
+      "structured"
+    ]
+  },
+  {
+    "name": "Jet Protocol",
+    "description": "Fixed-rate lending and governance protocol",
+    "url": "https://jetprotocol.io",
+    "tags": [
+      "defi",
+      "lending",
+      "governance"
+    ]
+  },
+  {
+    "name": "Port Finance",
+    "description": "Variable and fixed-rate lending protocol on Solana",
+    "url": "https://port.finance",
+    "tags": [
+      "defi",
+      "lending"
+    ]
+  },
+  {
+    "name": "Serum",
+    "description": "On-chain central limit order book (legacy, forked to OpenBook)",
+    "url": "https://projectserum.com",
+    "tags": [
+      "defi",
+      "clob",
+      "legacy"
+    ]
+  },
+  {
+    "name": "OpenBook",
+    "description": "Community fork of Serum order book",
+    "url": "https://openbookdex.com",
+    "tags": [
+      "defi",
+      "clob",
+      "orderbook"
+    ]
+  },
+  {
+    "name": "Token Metadata",
+    "description": "Metaplex standard for on-chain NFT and token metadata",
+    "url": "https://developers.metaplex.com",
+    "tags": [
+      "standard",
+      "metadata",
+      "nft"
+    ]
+  },
+  {
+    "name": "Bubblegum",
+    "description": "Metaplex program for minting compressed NFTs",
+    "url": "https://developers.metaplex.com/bubblegum",
+    "tags": [
+      "nft",
+      "compression",
+      "minting"
+    ]
+  },
+  {
+    "name": "Memo Program",
+    "description": "Solana program for attaching memo text to transactions",
+    "url": "https://spl.solana.com/memo",
+    "tags": [
+      "standard",
+      "utility"
+    ]
+  },
+  {
+    "name": "Glow",
+    "description": "Solana wallet focused on simplicity and DeFi access",
+    "url": "https://glow.app",
+    "tags": [
+      "wallet",
+      "consumer"
+    ]
+  },
+  {
+    "name": "Torus",
+    "description": "Social login wallet infrastructure for Solana dApps",
+    "url": "https://tor.us",
+    "tags": [
+      "wallet",
+      "social-login",
+      "infrastructure"
+    ]
+  },
+  {
+    "name": "Ledger Live",
+    "description": "Hardware wallet with Solana staking and DeFi support",
+    "url": "https://ledger.com",
+    "tags": [
+      "wallet",
+      "hardware",
+      "security"
+    ]
+  },
+  {
+    "name": "Cubik",
+    "description": "Community-driven grants platform for Solana ecosystem",
+    "url": "https://cubik.so",
+    "tags": [
+      "grants",
+      "community",
+      "funding"
+    ]
+  },
+  {
+    "name": "Superteam",
+    "description": "Community-driven ecosystem development organization",
+    "url": "https://superteam.fun",
+    "tags": [
+      "community",
+      "ecosystem"
+    ]
+  },
+  {
+    "name": "Colosseum",
+    "description": "Hackathon and accelerator platform for Solana builders",
+    "url": "https://colosseum.org",
+    "tags": [
+      "hackathon",
+      "accelerator"
+    ]
+  },
+  {
+    "name": "Solana Foundation",
+    "description": "Foundation supporting Solana ecosystem growth and development",
+    "url": "https://solana.org",
+    "tags": [
+      "foundation",
+      "ecosystem",
+      "grants"
+    ]
+  },
+  {
+    "name": "Jupiter LFG",
+    "description": "Community-driven token launchpad by Jupiter",
+    "url": "https://lfg.jup.ag",
+    "tags": [
+      "launchpad",
+      "defi",
+      "community"
+    ]
+  },
+  {
+    "name": "Socket",
+    "description": "Cross-chain abstraction layer for multi-chain dApps",
+    "url": "https://socket.tech",
+    "tags": [
+      "bridge",
+      "cross-chain",
+      "abstraction"
+    ]
+  },
+  {
+    "name": "LayerZero",
+    "description": "Omnichain interoperability protocol with Solana support",
+    "url": "https://layerzero.network",
+    "tags": [
+      "bridge",
+      "cross-chain",
+      "messaging"
+    ]
+  },
+  {
+    "name": "Blinks",
+    "description": "Blockchain links embedding Solana transactions in any URL",
+    "url": "https://docs.dialect.to/blinks",
+    "tags": [
+      "standard",
+      "ux",
+      "embedding"
+    ]
+  },
+  {
+    "name": "SolanaFM",
+    "description": "Comprehensive Solana blockchain explorer and indexer",
+    "url": "https://solana.fm",
+    "tags": [
+      "explorer",
+      "indexer",
+      "analytics"
+    ]
+  },
+  {
+    "name": "Anchor CLI",
+    "description": "Command-line tools for Anchor framework development",
+    "url": "https://anchor-lang.com/docs/installation",
+    "tags": [
+      "developer",
+      "cli",
+      "tooling"
+    ]
+  },
+  {
+    "name": "Solana CLI",
+    "description": "Official command-line interface for Solana blockchain interaction",
+    "url": "https://docs.solana.com/cli",
+    "tags": [
+      "developer",
+      "cli",
+      "official"
+    ]
+  },
+  {
+    "name": "SPL Token",
+    "description": "Standard token program for fungible and non-fungible tokens",
+    "url": "https://spl.solana.com/token",
+    "tags": [
+      "standard",
+      "token",
+      "program"
+    ]
+  },
+  {
+    "name": "Ore",
+    "description": "Proof-of-work mining token on Solana",
+    "url": "https://ore.supply",
+    "tags": [
+      "mining",
+      "token",
+      "pow"
+    ]
+  },
+  {
+    "name": "Axiom",
+    "description": "Professional trading terminal for Solana",
+    "url": "https://axiom.trade",
+    "tags": [
+      "trading",
+      "terminal",
+      "pro"
+    ]
+  },
+  {
+    "name": "Photon",
+    "description": "Trading platform for Solana tokens with advanced features",
+    "url": "https://photon-sol.tinyastro.io",
+    "tags": [
+      "trading",
+      "consumer"
+    ]
+  },
+  {
+    "name": "BullX",
+    "description": "Multi-chain trading bot with Solana support",
+    "url": "https://bullx.io",
+    "tags": [
+      "trading",
+      "bot"
+    ]
+  },
+  {
+    "name": "SolProject150",
+    "description": "Demo Solana ecosystem project #150 for corpus padding",
+    "url": "https://example.com/project-150",
+    "tags": [
+      "demo",
+      "placeholder"
+    ]
+  }
+]

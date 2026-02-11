@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Jupiter",
+    "repoUrl": "https://github.com/jup-ag/jupiter-core",
+    "idlPaths": ["programs/jupiter-core/idl/jupiter.json"],
+    "interfaceFiles": ["programs/jupiter-core/src/lib.rs"]
+  },
+  {
+    "name": "Marinade Finance",
+    "repoUrl": "https://github.com/marinade-finance/liquid-staking-program",
+    "idlPaths": ["target/idl/marinade_finance.json"],
+    "interfaceFiles": ["programs/marinade-finance/src/lib.rs"]
+  },
+  {
+    "name": "Drift Protocol",
+    "repoUrl": "https://github.com/drift-labs/protocol-v2",
+    "idlPaths": ["sdk/src/idl/drift.json"],
+    "interfaceFiles": ["programs/drift/src/lib.rs"]
+  },
+  {
+    "name": "Tensor",
+    "repoUrl": "https://github.com/tensor-hq/tensor-common",
+    "idlPaths": [],
+    "interfaceFiles": ["src/lib.rs"]
+  },
+  {
+    "name": "Marginfi",
+    "repoUrl": "https://github.com/mrgnlabs/marginfi-v2",
+    "idlPaths": ["target/idl/marginfi.json"],
+    "interfaceFiles": ["programs/marginfi/src/lib.rs"]
+  },
+  {
+    "name": "Phoenix",
+    "repoUrl": "https://github.com/Ellipsis-Labs/phoenix-v1",
+    "idlPaths": [],
+    "interfaceFiles": ["programs/phoenix-v1/src/lib.rs"]
+  },
+  {
+    "name": "Squads Protocol",
+    "repoUrl": "https://github.com/Squads-Protocol/v4",
+    "idlPaths": ["target/idl/squads_multisig_program.json"],
+    "interfaceFiles": ["programs/squads_multisig_program/src/lib.rs"]
+  },
+  {
+    "name": "Jito",
+    "repoUrl": "https://github.com/jito-foundation/jito-programs",
+    "idlPaths": [],
+    "interfaceFiles": ["programs/jito-tip-distribution/src/lib.rs"]
+  }
+]

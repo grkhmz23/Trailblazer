@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Report {
+  id          String      @id @default(cuid())
+  periodStart DateTime    @map("period_start")
+  periodEnd   DateTime    @map("period_end")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  configJson  Json        @default("{}") @map("config_json")
+  hash        String      @default("")
+  status      String      @default("pending") // pending | processing | complete | failed
+  candidates  Candidate[]
+  narratives  Narrative[]
+
+  @@map("reports")
+}
+
+model Entity {
+  id          String      @id @default(cuid())
+  kind        String      // program | repo | token | keyword | protocol
+  key         String      @unique // unique identifier (address, repo slug, etc.)
+  label       String
+  firstSeen   DateTime    @default(now()) @map("first_seen")
+  lastSeen    DateTime    @default(now()) @map("last_seen")
+  metricsJson Json        @default("{}") @map("metrics_json")
+  embedding   Float[]     @default([]) // stored as float array; pgvector used via raw SQL
+  candidates  Candidate[]
+
+  @@map("entities")
+}
+
+model Candidate {
+  id           String  @id @default(cuid())
+  reportId     String  @map("report_id")
+  entityId     String  @map("entity_id")
+  momentum     Float   @default(0)
+  novelty      Float   @default(0)
+  quality      Float   @default(0)
+  totalScore   Float   @default(0) @map("total_score")
+  featuresJson Json    @default("{}") @map("features_json")
+  report       Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  entity       Entity  @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@map("candidates")
+}
+
+model Narrative {
+  id                 String               @id @default(cuid())
+  reportId           String               @map("report_id")
+  title              String
+  summary            String
+  momentum           Float                @default(0)
+  novelty            Float                @default(0)
+  saturation         Float                @default(0)
+  scoresJson         Json                 @default("{}") @map("scores_json")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  report             Report               @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  evidence           NarrativeEvidence[]
+  investigationSteps InvestigationStep[]
+  ideas              Idea[]
+
+  @@map("narratives")
+}
+
+model NarrativeEvidence {
+  id          String    @id @default(cuid())
+  narrativeId String    @map("narrative_id")
+  type        String    // onchain | dev | social | idl_diff | dependency
+  title       String
+  url         String    @default("")
+  snippet     String    @default("")
+  metricsJson Json      @default("{}") @map("metrics_json")
+  narrative   Narrative @relation(fields: [narrativeId], references: [id], onDelete: Cascade)
+
+  @@map("narrative_evidence")
+}
+
+model InvestigationStep {
+  id            String    @id @default(cuid())
+  narrativeId   String    @map("narrative_id")
+  stepIndex     Int       @map("step_index")
+  tool          String    // repo_inspector | idl_differ | dependency_tracker | social_pain_finder | competitor_search
+  inputJson     Json      @default("{}") @map("input_json")
+  outputSummary String    @default("") @map("output_summary")
+  linksJson     Json      @default("[]") @map("links_json")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  narrative     Narrative @relation(fields: [narrativeId], references: [id], onDelete: Cascade)
+
+  @@map("investigation_steps")
+}
+
+model Idea {
+  id                 String    @id @default(cuid())
+  narrativeId        String    @map("narrative_id")
+  title              String
+  pitch              String    @default("")
+  targetUser         String    @default("") @map("target_user")
+  mvpScope           String    @default("") @map("mvp_scope")
+  whyNow             String    @default("") @map("why_now")
+  validation         String    @default("")
+  saturationJson     Json      @default("{}") @map("saturation_json")
+  pivot              String    @default("")
+  actionPackFilesJson Json     @default("{}") @map("action_pack_files_json")
+  narrative          Narrative @relation(fields: [narrativeId], references: [id], onDelete: Cascade)
+
+  @@map("ideas")
+}
