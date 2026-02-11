@@ -8,8 +8,8 @@
       "env": [
         "DATABASE_URL",
         "ADMIN_TOKEN",
-        "ANTHROPIC_API_KEY",
-        "ANTHROPIC_MODEL",
+        "MOONSHOT_API_KEY",
+        "MOONSHOT_MODEL",
         "HELIUS_API_KEY",
         "HELIUS_RPC_URL",
         "GITHUB_TOKEN",

@@ -219,7 +219,7 @@ export default function MethodologyPage() {
             {[
               { title: "Text Embeddings", desc: "384-dimensional character trigram hashing — deterministic, no external API dependency" },
               { title: "Average Linkage", desc: "Merge clusters above 0.45 cosine similarity threshold until max 10 clusters" },
-              { title: "AI Labeling", desc: "Claude Sonnet analyzes each cluster to generate narrative title and summary" },
+              { title: "AI Labeling", desc: "Kimi K2 analyzes each cluster to generate narrative title and summary" },
             ].map((item) => (
               <div key={item.title} className="rounded-xl border border-border/30 bg-muted/10 p-4">
                 <div className="text-sm font-semibold mb-1">{item.title}</div>
@@ -260,7 +260,7 @@ export default function MethodologyPage() {
         </div>
         <Card className="bg-card/40 p-6 space-y-4">
           <p className="text-sm text-muted-foreground">
-            Claude Sonnet powers three key analytical steps with structured JSON
+            Kimi K2 (Moonshot AI) powers three key analytical steps with structured JSON
             outputs validated by Zod schemas:
           </p>
           <div className="space-y-3">

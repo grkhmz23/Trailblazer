@@ -18,7 +18,7 @@ function envBool(key: string, fallback: boolean): boolean {
 
 export const config = {
   /** Core mode */
-  demoMode: envBool("DEMO_MODE", !process.env.ANTHROPIC_API_KEY),
+  demoMode: envBool("DEMO_MODE", !process.env.MOONSHOT_API_KEY),
   nodeEnv: env("NODE_ENV", "development"),
 
   /** Database */
@@ -27,9 +27,9 @@ export const config = {
   /** Security */
   adminToken: env("ADMIN_TOKEN", ""),
 
-  /** LLM — Anthropic Claude */
-  anthropicApiKey: env("ANTHROPIC_API_KEY"),
-  anthropicModel: env("ANTHROPIC_MODEL", "claude-sonnet-4-20250514"),
+  /** LLM — Moonshot Kimi */
+  moonshotApiKey: env("MOONSHOT_API_KEY"),
+  moonshotModel: env("MOONSHOT_MODEL", "kimi-k2-thinking-turbo"),
 
   /** Optional data source keys */
   heliusApiKey: env("HELIUS_API_KEY"),
@@ -41,7 +41,7 @@ export const config = {
 
   /** Derived checks */
   get hasLlm(): boolean {
-    return !this.demoMode && !!this.anthropicApiKey;
+    return !this.demoMode && !!this.moonshotApiKey;
   },
   get hasHelius(): boolean {
     return !!this.heliusApiKey;

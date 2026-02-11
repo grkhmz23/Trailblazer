@@ -1,7 +1,7 @@
 /**
- * LLM integration — Anthropic Claude Messages API.
+ * LLM integration — Moonshot Kimi (OpenAI-compatible API).
  *
- * Falls back to demo fixtures when ANTHROPIC_API_KEY is missing or DEMO_MODE=true.
+ * Falls back to demo fixtures when MOONSHOT_API_KEY is missing or DEMO_MODE=true.
  * Retries with exponential backoff on 429/5xx.
  */
 
@@ -25,7 +25,7 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function callAnthropic(
+async function callLLM(
   systemPrompt: string,
   userPrompt: string
 ): Promise<string> {
@@ -33,25 +33,27 @@ async function callAnthropic(
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("https://api.moonshot.ai/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": config.anthropicApiKey,
-          "anthropic-version": "2023-06-01",
+          "Authorization": `Bearer ${config.moonshotApiKey}`,
         },
         body: JSON.stringify({
-          model: config.anthropicModel,
+          model: config.moonshotModel,
           max_tokens: 4096,
-          system: systemPrompt,
-          messages: [{ role: "user", content: userPrompt }],
+          temperature: 0.4,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
         }),
       });
 
       if (res.status === 429 || res.status >= 500) {
         const delay = BASE_DELAY_MS * Math.pow(2, attempt);
         console.warn(
-          `Anthropic ${res.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`
+          `Moonshot ${res.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`
         );
         await sleep(delay);
         continue;
@@ -59,15 +61,13 @@ async function callAnthropic(
 
       if (!res.ok) {
         const body = await res.text();
-        throw new Error(`Anthropic API ${res.status}: ${body}`);
+        throw new Error(`Moonshot API ${res.status}: ${body}`);
       }
 
       const data = await res.json();
-      const textBlock = data.content?.find(
-        (b: { type: string }) => b.type === "text"
-      );
-      if (!textBlock?.text) throw new Error("No text in Anthropic response");
-      return textBlock.text;
+      const content = data.choices?.[0]?.message?.content;
+      if (!content) throw new Error("No content in Moonshot response");
+      return content;
     } catch (e) {
       lastError = e instanceof Error ? e : new Error(String(e));
       if (attempt < MAX_RETRIES - 1) {
@@ -76,7 +76,7 @@ async function callAnthropic(
     }
   }
 
-  throw lastError ?? new Error("Anthropic call failed after retries");
+  throw lastError ?? new Error("Moonshot call failed after retries");
 }
 
 function parseJsonFromLlm<T>(raw: string, schema: z.ZodType<T>): T {
@@ -187,7 +187,7 @@ export async function labelNarrative(
 ): Promise<NarrativeLabel> {
   if (!config.hasLlm) return demoNarrativeLabel(clusterDocs);
 
-  const raw = await callAnthropic(
+  const raw = await callLLM(
     "You are a Solana ecosystem analyst. Given a cluster of related signal documents, produce a narrative label. Return ONLY valid JSON with keys: title (string, max 100 chars), summary (string, 2-4 sentences), evidenceHints (string array, 2-5 items).",
     `Cluster documents:\n\n${clusterDocs.map((d, i) => `[${i + 1}] ${d}`).join("\n\n")}`
   );
@@ -200,7 +200,7 @@ export async function generateIdeas(
 ): Promise<Idea[]> {
   if (!config.hasLlm) return demoIdeas(narrative);
 
-  const raw = await callAnthropic(
+  const raw = await callLLM(
     "You are a startup idea generator specializing in Solana ecosystem opportunities. Given a narrative with evidence, generate 3-5 actionable build ideas. Return ONLY valid JSON: { ideas: [{ title, pitch, targetUser, mvpScope, whyNow, validation }] }.",
     `Narrative: ${narrative.title}\n\nSummary: ${narrative.summary}\n\nEvidence:\n${narrative.evidence.map((e, i) => `${i + 1}. ${e}`).join("\n")}`
   );
@@ -215,7 +215,7 @@ export async function generateActionPack(
 ): Promise<ActionPack> {
   if (!config.hasLlm) return demoActionPack(idea, narrativeTitle);
 
-  const raw = await callAnthropic(
+  const raw = await callLLM(
     `You are a technical product manager. Given a build idea for the Solana ecosystem, generate a complete Action Pack. Return ONLY valid JSON with keys: specMd (markdown product spec), techMd (markdown technical plan), milestonesMd (markdown milestones with checkboxes), depsJson (JSON string of dependencies).`,
     `Idea: ${idea.title}\nPitch: ${idea.pitch}\nTarget: ${idea.targetUser}\nMVP: ${idea.mvpScope}\nNarrative context: ${narrativeTitle}`
   );
