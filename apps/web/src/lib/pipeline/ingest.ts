@@ -1,16 +1,26 @@
 /**
  * Signal ingestion — live APIs in production, fixture fallback in demo mode.
  *
- * Orchestrates Helius (onchain), GitHub (dev), and RSS (social) ingestors,
- * then merges results into the unified MergedSignal format.
+ * Orchestrates Helius (onchain), GitHub (dev), RSS (social), and Twitter/X
+ * (KOL) ingestors, then merges results into the unified MergedSignal format.
  */
 
 import { config } from "@/lib/config";
 import { type MergedSignal } from "./scoring";
 import { TRACKED_PROTOCOLS, type TrackedProtocol } from "./protocols";
-import { ingestOnchainSignals, type OnchainSignalResult } from "./ingestors/helius";
+import {
+  ingestOnchainSignals,
+  type OnchainSignalResult,
+} from "./ingestors/helius";
 import { ingestDevSignals, type DevSignalResult } from "./ingestors/github";
-import { ingestSocialSignals, type SocialSignalResult } from "./ingestors/social";
+import {
+  ingestSocialSignals,
+  type SocialSignalResult,
+} from "./ingestors/social";
+import {
+  ingestTwitterSignals,
+  type TwitterSignalResult,
+} from "./ingestors/twitter";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -62,16 +72,16 @@ function loadDemoSignals(): MergedSignal[] {
 
 function mergeFixtureSignals(raw: RawFixture): MergedSignal[] {
   const onchainMap = new Map(
-    raw.signals.onchain.map((s) => [s.entity_key as string, s])
+    raw.signals.onchain.map((s: any) => [s.entity_key as string, s])
   );
   const devMap = new Map(
-    raw.signals.dev.map((s) => [s.entity_key as string, s])
+    raw.signals.dev.map((s: any) => [s.entity_key as string, s])
   );
   const socialMap = new Map(
-    raw.signals.social.map((s) => [s.entity_key as string, s])
+    raw.signals.social.map((s: any) => [s.entity_key as string, s])
   );
 
-  return raw.entities.map((ent) => {
+  return raw.entities.map((ent: any) => {
     const oc = onchainMap.get(ent.key) ?? {};
     const dv = devMap.get(ent.key) ?? {};
     const sc = socialMap.get(ent.key) ?? {};
@@ -97,16 +107,57 @@ function mergeLiveSignals(
   protocols: TrackedProtocol[],
   onchain: OnchainSignalResult[],
   dev: DevSignalResult[],
-  social: SocialSignalResult[]
+  social: SocialSignalResult[],
+  twitter: TwitterSignalResult[]
 ): MergedSignal[] {
-  const ocMap = new Map(onchain.map((o) => [o.entityKey, o]));
-  const devMap = new Map(dev.map((d) => [d.entityKey, d]));
-  const socialMap = new Map(social.map((s) => [s.entityKey, s]));
+  const ocMap = new Map(onchain.map((o: any) => [o.entityKey, o]));
+  const devMap = new Map(dev.map((d: any) => [d.entityKey, d]));
+  const socialMap = new Map(social.map((s: any) => [s.entityKey, s]));
+  const twitterMap = new Map(twitter.map((t: any) => [t.entityKey, t]));
 
-  return protocols.map((p) => {
+  return protocols.map((p: any) => {
     const oc = ocMap.get(p.key);
     const dv = devMap.get(p.key);
     const sc = socialMap.get(p.key);
+    const tw = twitterMap.get(p.key);
+
+    // Merge RSS mentions + Twitter KOL mentions into unified social signal
+    const rssMentions = sc?.mentions_count ?? 0;
+    const twitterMentions = tw?.kol_mentions ?? 0;
+    const totalMentions = rssMentions + twitterMentions;
+
+    const rssMentionsBaseline = sc?.mentions_count_baseline ?? 0;
+    const twitterMentionsBaseline = tw?.kol_mentions_baseline ?? 0;
+    const totalMentionsBaseline = rssMentionsBaseline + twitterMentionsBaseline;
+
+    const rssAuthors = sc?.unique_authors ?? 0;
+    const twitterAuthors = tw ? (tw.kol_mentions > 0 ? Math.min(tw.kol_mentions, 5) : 0) : 0;
+    const totalAuthors = rssAuthors + twitterAuthors;
+
+    const rssAuthorsBaseline = sc?.unique_authors_baseline ?? 0;
+    const totalAuthorsBaseline = rssAuthorsBaseline + (tw?.kol_mentions_baseline ?? 0 > 0 ? 1 : 0);
+
+    // Engagement: RSS engagement + weighted Twitter mentions (KOL tweets are higher signal)
+    const rssEngagement = sc?.engagement_score ?? 0;
+    const twitterEngagement = twitterMentions * 3; // KOL mentions worth 3x RSS
+    const totalEngagement = rssEngagement + twitterEngagement;
+
+    const rssEngagementBaseline = sc?.engagement_score_baseline ?? 0;
+    const twitterEngagementBaseline = twitterMentionsBaseline * 3;
+    const totalEngagementBaseline = rssEngagementBaseline + twitterEngagementBaseline;
+
+    // Merge snippets from both sources
+    const rssSnippets = (sc?.snippets ?? []).map((s: any) => ({
+      ...s,
+      source: s.source || "rss",
+    }));
+    const twitterSnippets = (tw?.top_kol_tweets ?? []).map((t: any) => ({
+      text: `@${t.author} (${t.authorLabel}): ${t.text}`,
+      url: t.url,
+      source: "twitter",
+      classification: t.classification as "announcement" | "pain_point" | "question" | "hype" | "discussion",
+    }));
+    const allSnippets = [...twitterSnippets, ...rssSnippets].slice(0, 10);
 
     return {
       key: p.key,
@@ -134,13 +185,13 @@ function mergeLiveSignals(
         releases_baseline: dv?.releases_baseline ?? 0,
       },
       social: {
-        mentions_count: sc?.mentions_count ?? 0,
-        mentions_count_baseline: sc?.mentions_count_baseline ?? 0,
-        unique_authors: sc?.unique_authors ?? 0,
-        unique_authors_baseline: sc?.unique_authors_baseline ?? 0,
-        engagement_score: sc?.engagement_score ?? 0,
-        engagement_score_baseline: sc?.engagement_score_baseline ?? 0,
-        snippets: sc?.snippets ?? [],
+        mentions_count: totalMentions,
+        mentions_count_baseline: totalMentionsBaseline,
+        unique_authors: totalAuthors,
+        unique_authors_baseline: totalAuthorsBaseline,
+        engagement_score: totalEngagement,
+        engagement_score_baseline: totalEngagementBaseline,
+        snippets: allSnippets,
       },
     };
   });
@@ -164,27 +215,47 @@ export async function ingestSignals(
 
   console.log("[Ingest] Live mode — querying real APIs");
   const pEnd = periodEnd ?? new Date();
-  const pStart = periodStart ?? new Date(pEnd.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const pStart =
+    periodStart ?? new Date(pEnd.getTime() - 14 * 24 * 60 * 60 * 1000);
 
   const protocols = TRACKED_PROTOCOLS;
 
-  // Run ingestors in parallel where possible
-  const [onchain, dev, social] = await Promise.all([
+  // Run all ingestors in parallel
+  const [onchain, dev, social, twitterResult] = await Promise.all([
     config.hasHelius
       ? ingestOnchainSignals(protocols, pStart, pEnd)
       : Promise.resolve<OnchainSignalResult[]>([]),
-    ingestDevSignals(protocols, pStart, pEnd), // GitHub works without token too
-    ingestSocialSignals(protocols, pStart, pEnd), // RSS needs no auth
+    ingestDevSignals(protocols, pStart, pEnd),
+    ingestSocialSignals(protocols, pStart, pEnd),
+    ingestTwitterSignals(protocols, pStart, pEnd).catch((e) => {
+      console.warn("[Ingest] Twitter ingestion failed:", e);
+      return {
+        perProtocol: [] as TwitterSignalResult[],
+        allTweets: [],
+        kolsReached: 0,
+        totalTweets: 0,
+      };
+    }),
   ]);
 
-  const merged = mergeLiveSignals(protocols, onchain, dev, social);
+  console.log(
+    `[Ingest] Twitter: ${twitterResult.kolsReached} KOLs reached, ${twitterResult.totalTweets} relevant tweets`
+  );
+
+  const merged = mergeLiveSignals(
+    protocols,
+    onchain,
+    dev,
+    social,
+    twitterResult.perProtocol
+  );
 
   // Filter out protocols with zero activity across all signals
   const active = merged.filter(
-    (s) =>
-      (s.onchain.tx_count ?? 0) > 0 ||
-      (s.dev.commits ?? 0) > 0 ||
-      (s.social.mentions_count ?? 0) > 0
+    (s: any) =>
+      s.onchain.tx_count > 0 ||
+      s.dev.commits > 0 ||
+      s.social.mentions_count > 0
   );
 
   console.log(
@@ -194,12 +265,22 @@ export async function ingestSignals(
 }
 
 export function loadProjectCorpus(): {
-  meta: Array<{ name: string; url: string; description: string; tags: string[] }>;
+  meta: Array<{
+    name: string;
+    url: string;
+    description: string;
+    tags: string[];
+  }>;
   embeddings: number[][];
 } {
   try {
     const projects = loadFixture<
-      Array<{ name: string; description: string; url: string; tags: string[] }>
+      Array<{
+        name: string;
+        description: string;
+        url: string;
+        tags: string[];
+      }>
     >("projects.json");
     const embeddings = loadFixture<number[][]>("projects_embeddings.json");
     return { meta: projects, embeddings };

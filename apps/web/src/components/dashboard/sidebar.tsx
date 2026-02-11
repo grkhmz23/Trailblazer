@@ -7,6 +7,7 @@ import {
   FileText,
   Search,
   Zap,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ const NAV_ITEMS = [
   { href: "/", label: "Latest Report", icon: LayoutDashboard },
   { href: "/reports", label: "All Reports", icon: FileText },
   { href: "/explore", label: "Explore", icon: Search },
+  { href: "/methodology", label: "Methodology", icon: BookOpen },
 ];
 
 export function Sidebar() {
@@ -53,6 +55,31 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      {/* Data Sources Status */}
+      <div className="border-t border-border px-4 py-3">
+        <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          Data Sources
+        </p>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+            Helius Onchain
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+            GitHub Dev Activity
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+            Twitter / X KOLs
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+            RSS News Feeds
+          </div>
+        </div>
+      </div>
 
       <div className="border-t border-border px-6 py-4">
         <p className="text-xs text-muted-foreground">
