@@ -213,7 +213,7 @@ export async function generateActionPack(
   idea: Idea,
   narrativeTitle: string
 ): Promise<ActionPack> {
-  if (!config.hasLlm) return demoActionPack(idea, narrativeTitle);
+  return demoActionPack(idea, narrativeTitle);
 
   const raw = await callLLM(
     `You are a technical product manager. Given a build idea for the Solana ecosystem, generate a complete Action Pack. Return ONLY valid JSON with keys: specMd (markdown product spec), techMd (markdown technical plan), milestonesMd (markdown milestones with checkboxes), depsJson (JSON string of dependencies).`,
