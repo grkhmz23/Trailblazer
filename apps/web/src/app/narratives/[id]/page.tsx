@@ -45,7 +45,7 @@ export default async function NarrativeDetailPage({ params }: Props) {
     metricsJson: e.metricsJson as Record<string, unknown>,
   }));
 
-  const ideasData = narrative.ideas.map((idea) => ({
+  const ideasData = narrative.ideas.map((idea: any) => ({
     id: idea.id,
     title: idea.title,
     pitch: idea.pitch,
@@ -119,7 +119,7 @@ export default async function NarrativeDetailPage({ params }: Props) {
           Build Ideas ({ideasData.length})
         </h2>
         <div className="space-y-4">
-          {ideasData.map((idea) => (
+          {ideasData.map((idea: any) => (
             <IdeaCard key={idea.id} idea={idea} />
           ))}
         </div>
