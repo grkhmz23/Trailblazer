@@ -1,20 +1,16 @@
 /**
  * Twitter / X KOL Signal Ingestor.
  *
- * Monitors Solana ecosystem Key Opinion Leaders via public RSS proxies
+ * Monitors 90+ Solana ecosystem Key Opinion Leaders via public RSS proxies
  * (Nitter instances) and extracts narrative signals from their posts.
  *
- * Tracked KOLs (per grant spec):
- *  - Mert (0xMert_)         — Helius CEO, infra commentary
- *  - Toly (aeyakovenko)     — Solana co-founder
- *  - Raj (rajgokal)          — Solana co-founder
- *  - Akshay (akshaybd)      — Solana ecosystem
- *  - Solana official         — Announcements
- *  - Jupiter Exchange        — DeFi leader
- *  - Drift Protocol          — Perps commentary
- *  - Helius                  — Infra / dev tooling
- *  - Messari                 — Research reports
- *  - Electric Capital        — Dev reports
+ * KOL tiers:
+ *  - core_team: Solana co-founders, Labs, Foundation
+ *  - protocol_founder: Founders/CEOs of top Solana projects
+ *  - vc_researcher: Crypto VCs and research firms
+ *  - dev_advocate: DevRel, Superteam, educators, podcasters
+ *  - mega_influencer: Market-moving accounts (Elon, CZ, etc.)
+ *  - ct_alpha: Crypto Twitter alpha callers with Solana focus
  *
  * Falls back gracefully if proxies are down.
  */
@@ -28,30 +24,122 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+type KolCategory = "kol" | "official" | "research";
+
+/** Map Grok tiers to our internal categories */
+function tierToCategory(tier: string): KolCategory {
+  switch (tier) {
+    case "core_team":
+    case "protocol_founder":
+      return "official";
+    case "vc_researcher":
+      return "research";
+    default:
+      return "kol";
+  }
+}
+
 /** Solana ecosystem KOL accounts to monitor */
-export const SOLANA_KOLS = [
-  // Core ecosystem leaders (named in grant spec)
-  { handle: "0xMert_", label: "Mert (Helius)", category: "kol" as const },
-  { handle: "aeyakovenko", label: "Toly (Solana)", category: "kol" as const },
-  { handle: "rajgokal", label: "Raj Gokal (Solana)", category: "kol" as const },
-  { handle: "akshaybd", label: "Akshay Sriram", category: "kol" as const },
+export const SOLANA_KOLS: Array<{ handle: string; label: string; category: KolCategory }> = [
+  // ─── Core Solana Leadership ────────────────────────
+  { handle: "aeyakovenko", label: "Toly (Solana Co-founder)", category: "official" },
+  { handle: "rajgokal", label: "Raj Gokal (Solana Co-founder)", category: "official" },
+  { handle: "solanalabs", label: "Solana Labs", category: "official" },
+  { handle: "solanafndn", label: "Solana Foundation", category: "official" },
 
-  // Official protocol accounts
-  { handle: "solaboranastatus", label: "Solana Status", category: "official" as const },
-  { handle: "JupiterExchange", label: "Jupiter", category: "official" as const },
-  { handle: "DriftProtocol", label: "Drift", category: "official" as const },
-  { handle: "heaborlius_dev", label: "Helius", category: "official" as const },
+  // ─── Protocol Founders / Official Accounts ─────────
+  { handle: "0xMert_", label: "Mert (Helius CEO)", category: "official" },
+  { handle: "weremeow", label: "Meow (Jupiter Founder)", category: "official" },
+  { handle: "cindylblock", label: "Cindy Leow (Drift Founder)", category: "official" },
+  { handle: "lucasbruder", label: "Lucas Bruder (Jito CEO)", category: "official" },
+  { handle: "JupiterExchange", label: "Jupiter", category: "official" },
+  { handle: "DriftProtocol", label: "Drift", category: "official" },
+  { handle: "marinade_finance", label: "Marinade Finance", category: "official" },
+  { handle: "jito_labs", label: "Jito Labs", category: "official" },
+  { handle: "ilialexeev", label: "Ilia Alexeev (Tensor Founder)", category: "official" },
+  { handle: "tensor_hq", label: "Tensor", category: "official" },
+  { handle: "metaplex", label: "Metaplex", category: "official" },
+  { handle: "PythNetwork", label: "Pyth Network", category: "official" },
+  { handle: "wormholecrypto", label: "Wormhole", category: "official" },
+  { handle: "wormhole", label: "Wormhole Official", category: "official" },
+  { handle: "yutaro_xyz", label: "Yutaro (Orca Founder)", category: "official" },
+  { handle: "orca_so", label: "Orca", category: "official" },
+  { handle: "RaydiumProtocol", label: "Raydium", category: "official" },
+  { handle: "MeteoraAG", label: "Meteora", category: "official" },
+  { handle: "phoenixv1ex", label: "Phoenix", category: "official" },
+  { handle: "marginfi", label: "Marginfi", category: "official" },
+  { handle: "KaminoFinance", label: "Kamino Finance", category: "official" },
+  { handle: "sanctumso", label: "Sanctum", category: "official" },
+  { handle: "SquadsProtocol", label: "Squads", category: "official" },
+  { handle: "lightprotocol", label: "Light Protocol", category: "official" },
+  { handle: "helium", label: "Helium", category: "official" },
+  { handle: "heliuslabs", label: "Helius Labs", category: "official" },
+  { handle: "phantom", label: "Phantom", category: "official" },
+  { handle: "backpack", label: "Backpack", category: "official" },
+  { handle: "MagicEden", label: "Magic Eden", category: "official" },
+  { handle: "bonk_inu", label: "Bonk", category: "official" },
+  { handle: "pumpdotfun", label: "Pump.fun", category: "official" },
+  { handle: "rendernetwork", label: "Render Network", category: "official" },
+  { handle: "hivemapper", label: "Hivemapper", category: "official" },
+  { handle: "eash0x", label: "Eash (Pye Finance)", category: "official" },
 
-  // Research & data
-  { handle: "MessariCrypto", label: "Messari", category: "research" as const },
-  { handle: "ElectricCapital", label: "Electric Capital", category: "research" as const },
+  // ─── VC / Research ─────────────────────────────────
+  { handle: "ElectricCapital", label: "Electric Capital", category: "research" },
+  { handle: "MessariCrypto", label: "Messari", category: "research" },
+  { handle: "MulticoinCap", label: "Multicoin Capital", category: "research" },
+  { handle: "KyleSamani", label: "Kyle Samani (Multicoin)", category: "research" },
+  { handle: "placeholdervc", label: "Placeholder VC", category: "research" },
+  { handle: "cburniske", label: "Chris Burniske (Placeholder)", category: "research" },
+  { handle: "JumpCrypto", label: "Jump Crypto", category: "research" },
+  { handle: "dragonfly_xyz", label: "Dragonfly", category: "research" },
+  { handle: "a16zcrypto", label: "a16z Crypto", category: "research" },
+  { handle: "polychain", label: "Polychain", category: "research" },
+  { handle: "PanteraCapital", label: "Pantera Capital", category: "research" },
+  { handle: "paradigm", label: "Paradigm", category: "research" },
+  { handle: "galaxyhq", label: "Galaxy Digital", category: "research" },
+  { handle: "LowBeta_", label: "Zach Pandl (Grayscale)", category: "research" },
 
-  // Additional Solana KOLs
-  { handle: "armaborjess", label: "Armani Ferrante", category: "kol" as const },
-  { handle: "CantelopePeel", label: "Cantelope Peel", category: "kol" as const },
-  { handle: "solblaze_org", label: "SolBlaze", category: "official" as const },
-  { handle: "TensorFndn", label: "Tensor", category: "official" as const },
-  { handle: "MarginFi", label: "Marginfi", category: "official" as const },
+  // ─── Dev Advocates / Educators / Podcasters ────────
+  { handle: "superteamdao", label: "Superteam", category: "kol" },
+  { handle: "solana_devs", label: "Solana Devs", category: "kol" },
+  { handle: "Lightspeedpodhq", label: "Lightspeed Podcast", category: "kol" },
+  { handle: "nickwh8te", label: "Nick White (Educator)", category: "kol" },
+  { handle: "amiravalliani", label: "Amir (Solana Growth)", category: "kol" },
+  { handle: "afkehaya", label: "Alex Kehaya (Podcast)", category: "kol" },
+  { handle: "nickyscanz", label: "Nicky Scanz (Podcast)", category: "kol" },
+  { handle: "GivnerAriel", label: "Ariel Givner (Legal)", category: "kol" },
+  { handle: "armaborjess", label: "Armani Ferrante", category: "kol" },
+  { handle: "CantelopePeel", label: "Cantelope Peel", category: "kol" },
+  { handle: "solblaze_org", label: "SolBlaze", category: "kol" },
+  { handle: "akshaybd", label: "Akshay Sriram", category: "kol" },
+
+  // ─── Mega Influencers ──────────────────────────────
+  { handle: "elonmusk", label: "Elon Musk", category: "kol" },
+  { handle: "cz_binance", label: "CZ (Binance)", category: "kol" },
+  { handle: "VitalikButerin", label: "Vitalik Buterin", category: "kol" },
+  { handle: "brian_armstrong", label: "Brian Armstrong (Coinbase)", category: "kol" },
+  { handle: "APompliano", label: "Anthony Pompliano", category: "kol" },
+  { handle: "balajis", label: "Balaji Srinivasan", category: "kol" },
+
+  // ─── CT Alpha / Solana-focused ─────────────────────
+  { handle: "blknoiz06", label: "Ansem", category: "kol" },
+  { handle: "inversebrah", label: "Inversebrah", category: "kol" },
+  { handle: "ZackXBT", label: "ZachXBT (Investigator)", category: "kol" },
+  { handle: "Ash_crypto", label: "Ash Crypto", category: "kol" },
+  { handle: "SolBigBrain", label: "SolBigBrain", category: "kol" },
+  { handle: "SolanaFloor", label: "SolanaFloor (News)", category: "kol" },
+  { handle: "SolanaSensei", label: "Solana Sensei", category: "kol" },
+  { handle: "cryptophilienne", label: "CryptoPhilienne", category: "kol" },
+  { handle: "defi_kay_", label: "Defi Kay (Podcast)", category: "kol" },
+  { handle: "DegenPing", label: "DegenPing", category: "kol" },
+  { handle: "CryptoCobain", label: "CryptoCobain", category: "kol" },
+  { handle: "AltcoinDailyio", label: "Altcoin Daily", category: "kol" },
+  { handle: "LarkDavis", label: "Lark Davis", category: "kol" },
+  { handle: "mozzacrypto", label: "Mozza Crypto", category: "kol" },
+  { handle: "AltcoinGordon", label: "Altcoin Gordon", category: "kol" },
+  { handle: "CryptoWendyO", label: "CryptoWendyO", category: "kol" },
+  { handle: "ErikVoorhees", label: "Erik Voorhees", category: "kol" },
+  { handle: "WhalePanda", label: "WhalePanda", category: "kol" },
 ];
 
 /** Multiple Nitter instances to try (some may be down) */
@@ -69,7 +157,7 @@ interface TweetItem {
   text: string;
   url: string;
   published: string;
-  category: "kol" | "official" | "research";
+  category: KolCategory;
 }
 
 /**
@@ -79,7 +167,7 @@ interface TweetItem {
 async function fetchKolFeed(
   handle: string,
   label: string,
-  category: "kol" | "official" | "research"
+  category: KolCategory
 ): Promise<TweetItem[]> {
   for (const instance of NITTER_INSTANCES) {
     try {
@@ -107,7 +195,6 @@ async function fetchKolFeed(
         return items;
       }
     } catch {
-      // Try next instance
       continue;
     }
   }
@@ -122,7 +209,7 @@ function parseRssFeed(
   xml: string,
   handle: string,
   label: string,
-  category: "kol" | "official" | "research"
+  category: KolCategory
 ): TweetItem[] {
   const items: TweetItem[] = [];
   const itemRegex = /<item>([\s\S]*?)<\/item>/g;
@@ -138,8 +225,8 @@ function parseRssFeed(
     const pubDate = block.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] ?? "";
     const desc =
       block
-        .match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/s)?.[1] ??
-      block.match(/<description>(.*?)<\/description>/s)?.[1] ??
+        .match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/)?.[1] ??
+      block.match(/<description>([\s\S]*?)<\/description>/)?.[1] ??
       "";
 
     if (title) {
@@ -147,7 +234,7 @@ function parseRssFeed(
         author: handle,
         authorLabel: label,
         text: decodeEntities(title + " " + desc).slice(0, 600),
-        url: link.replace(/nitter\.[^/]+/, "x.com"), // Convert nitter URL back to x.com
+        url: link.replace(/nitter\.[^/]+/, "x.com"),
         published: pubDate,
         category,
       });
@@ -164,75 +251,42 @@ function decodeEntities(text: string): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/<[^>]+>/g, "") // strip HTML
+    .replace(/<[^>]+>/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 /** Keywords indicating Solana narrative relevance */
 const SOLANA_KEYWORDS = [
-  "solana",
-  "sol",
-  "$sol",
-  "defi",
-  "nft",
-  "depin",
-  "blink",
-  "compressed",
-  "zk compression",
-  "firedancer",
-  "token extensions",
-  "restaking",
-  "liquid staking",
-  "mev",
-  "jito",
-  "jupiter",
-  "drift",
-  "marinade",
-  "raydium",
-  "orca",
-  "meteora",
-  "tensor",
-  "metaplex",
-  "helium",
-  "pyth",
-  "wormhole",
-  "phantom",
-  "backpack",
-  "madlads",
-  "bonk",
-  "jup",
-  "pump.fun",
-  "memecoin",
-  "airdrop",
-  "svm",
-  "validator",
-  "rpc",
-  "helius",
-  "quicknode",
-  "anchor",
-  "seahorse",
-  "clockwork",
-  "squads",
-  "realms",
-  "dao",
-  "governance",
-  "staking",
-  "yield",
-  "perps",
-  "orderbook",
-  "amm",
-  "clmm",
-  "dlmm",
-  "payments",
-  "payfi",
-  "ai agent",
-  "on-chain",
-  "onchain",
-  "mainnet",
-  "devnet",
-  "breakpoint",
-  "superteam",
+  "solana", "sol", "$sol",
+  "defi", "nft", "depin", "blink",
+  "compressed", "zk compression", "firedancer",
+  "token extensions", "restaking", "liquid staking",
+  "mev", "jito", "jupiter", "drift",
+  "marinade", "raydium", "orca", "meteora",
+  "tensor", "metaplex", "helium", "pyth",
+  "wormhole", "phantom", "backpack",
+  "madlads", "bonk", "jup", "pump.fun",
+  "memecoin", "airdrop", "svm",
+  "validator", "rpc", "helius", "quicknode",
+  "anchor", "seahorse", "clockwork",
+  "squads", "realms", "dao", "governance",
+  "staking", "yield", "perps",
+  "orderbook", "amm", "clmm", "dlmm",
+  "payments", "payfi", "ai agent",
+  "on-chain", "onchain", "mainnet", "devnet",
+  "breakpoint", "superteam",
+  "kamino", "marginfi", "sanctum", "phoenix",
+  "zeta", "parcl", "flash trade",
+  "render", "hivemapper", "dogwifhat", "wif",
+  "popcat", "bonk", "moonshot",
+  "magic eden", "ondo", "dflow", "genopets",
+  "pyusd", "rwa", "tokenization",
+  "light protocol", "switchboard",
+  "grizzlython", "hyperdrive", "colosseum",
+  "saga", "seeker", "solana mobile",
+  "tip router", "stakenet", "mrgn",
+  "blazestake", "solblaze",
 ];
 
 /**
@@ -313,7 +367,7 @@ function classifyTweet(
     return "alpha";
   }
   if (
-    lower.includes("🚀") ||
+    lower.includes("\u{1F680}") ||
     lower.includes("lfg") ||
     lower.includes("bullish") ||
     lower.includes("moon") ||
@@ -418,7 +472,6 @@ export async function ingestTwitterSignals(
       extractProtocolMentions(t.text, [protocol]).length > 0
     );
 
-    // Count by category
     const kolMentions = currentMentions.filter(
       (t) => t.category === "kol"
     ).length;
@@ -429,14 +482,12 @@ export async function ingestTwitterSignals(
       (t) => t.category === "official"
     ).length;
 
-    // Sentiment breakdown
     const sentimentBreakdown: Record<string, number> = {};
     for (const tweet of currentMentions) {
       const cls = classifyTweet(tweet.text);
       sentimentBreakdown[cls] = (sentimentBreakdown[cls] || 0) + 1;
     }
 
-    // Top KOL tweets (most interesting)
     const topKolTweets = currentMentions
       .filter((t) => t.category === "kol" || t.category === "research")
       .slice(0, 5)

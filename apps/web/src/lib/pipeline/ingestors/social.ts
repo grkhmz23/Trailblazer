@@ -21,6 +21,10 @@ const RSS_FEEDS = [
   "https://www.theblock.co/rss/all",
   "https://cointelegraph.com/rss",
   "https://rss.app/feeds/v1.1/solana-news.json",
+  "https://www.coindesk.com/arc/outboundfeeds/rss/",
+  "https://decrypt.co/feed",
+  "https://blockworks.co/rss",
+  "https://messari.io/rss",
 ];
 
 /** Simple feed item structure */
@@ -120,7 +124,7 @@ function decodeEntities(text: string): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/<[^>]+>/g, "") // strip HTML tags
+    .replace(/<[^>]+>/g, "")
     .trim();
 }
 
@@ -156,7 +160,7 @@ function classifySnippet(
   if (lower.includes("launch") || lower.includes("release") || lower.includes("announce") || lower.includes("introducing") || lower.includes("upgrade")) {
     return "announcement";
   }
-  if (lower.includes("🚀") || lower.includes("moon") || lower.includes("bullish") || lower.includes("lfg") || lower.includes("alpha")) {
+  if (lower.includes("\u{1F680}") || lower.includes("moon") || lower.includes("bullish") || lower.includes("lfg") || lower.includes("alpha")) {
     return "hype";
   }
   return "discussion";
@@ -170,7 +174,6 @@ function mentionsProtocol(item: FeedItem, protocol: TrackedProtocol): boolean {
   const searchTerms = [
     protocol.label.toLowerCase(),
     protocol.key.toLowerCase(),
-    // Additional matching patterns
     ...protocol.label.toLowerCase().split(/[\s-]+/).filter((w) => w.length > 3),
   ];
   return searchTerms.some((term) => searchText.includes(term));
@@ -186,10 +189,10 @@ export async function ingestSocialSignals(
 ): Promise<SocialSignalResult[]> {
   console.log(`[Social] Fetching ${RSS_FEEDS.length} RSS feeds...`);
 
-  // Fetch all feeds
   const allItems: FeedItem[] = [];
   for (const feed of RSS_FEEDS) {
     const items = await fetchFeed(feed);
+    console.log(`[Social] ${safeHostname(feed)}: ${items.length} items`);
     allItems.push(...items);
     await sleep(REQUEST_DELAY_MS);
   }
@@ -202,7 +205,7 @@ export async function ingestSocialSignals(
       const pubDate = new Date(item.published);
       return pubDate >= periodStart && pubDate <= periodEnd;
     } catch {
-      return false; // invalid date
+      return false;
     }
   });
 
@@ -231,11 +234,9 @@ export async function ingestSocialSignals(
       mentionsProtocol(item, protocol)
     );
 
-    // Unique sources as proxy for unique authors
     const currentSources = new Set(currentMentions.map((m) => m.link));
     const baselineSources = new Set(baselineMentions.map((m) => m.link));
 
-    // Engagement score: mention count weighted by content length
     const engagementCurrent = currentMentions.reduce(
       (sum, m) => sum + Math.min(m.content.length, 500) / 100,
       0
@@ -245,7 +246,6 @@ export async function ingestSocialSignals(
       0
     );
 
-    // Build snippets from current mentions
     const snippets = currentMentions.slice(0, 8).map((item) => ({
       text: `${item.title}: ${item.content.slice(0, 200)}`,
       url: item.link,
