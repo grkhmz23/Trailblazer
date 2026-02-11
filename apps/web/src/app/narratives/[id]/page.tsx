@@ -26,7 +26,7 @@ export default async function NarrativeDetailPage({ params }: Props) {
 
   if (!narrative) return notFound();
 
-  const steps = narrative.investigationSteps.map((s) => ({
+  const steps = narrative.investigationSteps.map((s: any) => ({
     id: s.id,
     stepIndex: s.stepIndex,
     tool: s.tool,
