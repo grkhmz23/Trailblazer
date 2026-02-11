@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/dashboard/sidebar";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Solana Narrative Hunter",
+  title: "Narrative Hunter — Solana Ecosystem",
   description:
-    "AI-powered narrative detection for the Solana ecosystem. Fortnightly reports with actionable build ideas.",
+    "AI-powered narrative detection for the Solana ecosystem. Discover emerging trends before they become obvious.",
 };
 
 export default function RootLayout({
@@ -18,14 +15,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>
-        <div className="flex min-h-screen">
+      <body>
+        {/* Background mesh */}
+        <div className="bg-mesh" />
+
+        <div className="relative flex min-h-screen">
           <Sidebar />
-          <main className="flex-1 overflow-auto">
-            <div className="mx-auto max-w-7xl px-6 py-8">{children}</div>
+          <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
+            <div className="mx-auto max-w-6xl">
+              {children}
+            </div>
           </main>
         </div>
       </body>
     </html>
   );
 }
+

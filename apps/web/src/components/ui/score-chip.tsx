@@ -5,53 +5,58 @@ interface ScoreChipProps {
   label: string;
   value: number;
   type: "momentum" | "novelty" | "saturation";
+  size?: "sm" | "md";
 }
 
 const chipConfig = {
   momentum: {
     icon: TrendingUp,
-    colorFn: (v: number) =>
-      v >= 0.7
-        ? "text-emerald-400 bg-emerald-500/10"
-        : v >= 0.4
-          ? "text-amber-400 bg-amber-500/10"
-          : "text-zinc-400 bg-zinc-500/10",
+    gradient: "from-emerald-500 to-emerald-400",
+    bg: "bg-emerald-500/8",
+    text: "text-emerald-400",
+    barColor: "bg-gradient-to-r from-emerald-600 to-emerald-400",
   },
   novelty: {
     icon: Sparkles,
-    colorFn: (v: number) =>
-      v >= 0.7
-        ? "text-violet-400 bg-violet-500/10"
-        : v >= 0.4
-          ? "text-blue-400 bg-blue-500/10"
-          : "text-zinc-400 bg-zinc-500/10",
+    gradient: "from-violet-500 to-purple-400",
+    bg: "bg-violet-500/8",
+    text: "text-violet-400",
+    barColor: "bg-gradient-to-r from-violet-600 to-purple-400",
   },
   saturation: {
     icon: Target,
-    colorFn: (v: number) =>
-      v <= 0.3
-        ? "text-emerald-400 bg-emerald-500/10"
-        : v <= 0.6
-          ? "text-amber-400 bg-amber-500/10"
-          : "text-red-400 bg-red-500/10",
+    gradient: "from-amber-500 to-orange-400",
+    bg: "bg-amber-500/8",
+    text: "text-amber-400",
+    barColor: "bg-gradient-to-r from-amber-600 to-orange-400",
   },
 };
 
-export function ScoreChip({ label, value, type }: ScoreChipProps) {
+export function ScoreChip({ label, value, type, size = "md" }: ScoreChipProps) {
   const config = chipConfig[type];
   const Icon = config.icon;
-  const colorClass = config.colorFn(value);
+  const pct = Math.round(value * 100);
 
   return (
-    <div
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium",
-        colorClass
-      )}
-    >
-      <Icon className="h-3 w-3" />
-      <span>{label}</span>
-      <span className="font-bold">{(value * 100).toFixed(0)}</span>
+    <div className={cn(
+      "flex items-center gap-2.5 rounded-lg border border-border/30",
+      config.bg,
+      size === "sm" ? "px-2 py-1" : "px-3 py-1.5"
+    )}>
+      <Icon className={cn("shrink-0", config.text, size === "sm" ? "h-3 w-3" : "h-3.5 w-3.5")} />
+      <div className="flex flex-col gap-0.5 min-w-[60px]">
+        <div className="flex items-center justify-between">
+          <span className={cn("font-medium text-muted-foreground", size === "sm" ? "text-[10px]" : "text-[11px]")}>{label}</span>
+          <span className={cn("font-mono font-semibold", config.text, size === "sm" ? "text-[10px]" : "text-xs")}>{pct}</span>
+        </div>
+        <div className="score-bar">
+          <div
+            className={cn("score-bar-fill", config.barColor)}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
+

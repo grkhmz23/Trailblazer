@@ -1,12 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Loader2, Target, Users, Clock, CheckCircle2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { saturationColor } from "@/lib/utils";
+import {
+  Lightbulb,
+  ChevronDown,
+  Download,
+  Users,
+  Rocket,
+  Clock,
+  Shield,
+  ArrowUpRight,
+  Zap,
+} from "lucide-react";
+import { cn, saturationColor } from "@/lib/utils";
 
-interface IdeaProps {
+interface IdeaData {
   id: string;
   title: string;
   pitch: string;
@@ -22,143 +32,109 @@ interface IdeaProps {
   pivot: string;
 }
 
-function safeUrl(url: string): string | null {
-  if (!url) return null;
-  try {
-    const parsed = new URL(url, "https://example.com");
-    if (parsed.protocol === "https:" || parsed.protocol === "http:") {
-      return url;
-    }
-  } catch {
-    // malformed URL — skip
-  }
-  return null;
-}
-
-export function IdeaCard({ idea }: { idea: IdeaProps }) {
-  const [downloading, setDownloading] = useState(false);
+export function IdeaCard({ idea }: { idea: IdeaData }) {
+  const [expanded, setExpanded] = useState(false);
   const sat = idea.saturationJson;
 
-  const handleDownload = async () => {
-    setDownloading(true);
-    try {
-      const res = await fetch(`/api/ideas/${idea.id}/action-pack.zip`);
-      if (!res.ok) throw new Error("Download failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${idea.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-action-pack.zip`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("Download error:", e);
-    } finally {
-      setDownloading(false);
-    }
-  };
-
   return (
-    <Card className="space-y-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h4 className="text-base font-semibold">{idea.title}</h4>
-          <p className="mt-1 text-sm text-muted-foreground">{idea.pitch}</p>
+    <Card className={cn(
+      "overflow-hidden transition-all duration-300",
+      expanded && "ring-1 ring-primary/20 shadow-lg shadow-primary/5"
+    )}>
+      {/* Header */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex w-full items-start justify-between text-left gap-4"
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 ring-1 ring-amber-500/20">
+            <Lightbulb className="h-4 w-4 text-amber-400" />
+          </div>
+          <div>
+            <h4 className="font-semibold text-sm leading-tight">{idea.title}</h4>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-2">{idea.pitch}</p>
+          </div>
         </div>
-        <button
-          onClick={handleDownload}
-          disabled={downloading}
-          className="flex flex-shrink-0 items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
-        >
-          {downloading ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Download className="h-3.5 w-3.5" />
-          )}
-          {downloading ? "Downloading..." : "Action Pack"}
-        </button>
-      </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Badge className={saturationColor(sat.level)}>
+            {sat.level}
+          </Badge>
+          <ChevronDown className={cn(
+            "h-4 w-4 text-muted-foreground transition-transform duration-200",
+            expanded && "rotate-180"
+          )} />
+        </div>
+      </button>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="flex items-start gap-2 text-sm">
-          <Users className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
-          <div>
-            <span className="font-medium">Target User</span>
-            <p className="text-muted-foreground">{idea.targetUser}</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-2 text-sm">
-          <Clock className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
-          <div>
-            <span className="font-medium">MVP Scope</span>
-            <p className="text-muted-foreground">{idea.mvpScope}</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-2 text-sm">
-          <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
-          <div>
-            <span className="font-medium">Why Now</span>
-            <p className="text-muted-foreground">{idea.whyNow}</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-2 text-sm">
-          <Target className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
-          <div>
-            <span className="font-medium">Validation</span>
-            <p className="text-muted-foreground">{idea.validation}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Saturation / Blue Ocean */}
-      {sat && (
-        <div className="rounded-lg border border-border bg-muted/30 p-3">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="text-xs font-medium">Market Saturation</span>
-            <Badge className={saturationColor(sat.level)}>
-              {sat.level?.toUpperCase()} ({((sat.score ?? 0) * 100).toFixed(0)}%)
-            </Badge>
+      {/* Expanded */}
+      {expanded && (
+        <div className="mt-5 space-y-5 border-t border-border/30 pt-5 animate-fade-in">
+          {/* Detail grid */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[
+              { icon: Users, label: "Target User", value: idea.targetUser },
+              { icon: Rocket, label: "MVP Scope", value: idea.mvpScope },
+              { icon: Clock, label: "Why Now", value: idea.whyNow },
+              { icon: Shield, label: "Validation", value: idea.validation },
+            ].map((field) => (
+              <div key={field.label} className="rounded-lg bg-muted/20 border border-border/20 p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground mb-1.5">
+                  <field.icon className="h-3 w-3" />
+                  {field.label}
+                </div>
+                <p className="text-sm leading-relaxed">{field.value}</p>
+              </div>
+            ))}
           </div>
 
+          {/* Similar projects */}
           {sat.neighbors && sat.neighbors.length > 0 && (
-            <div className="space-y-1">
-              <span className="text-xs text-muted-foreground">
-                Nearest competitors:
-              </span>
-              {sat.neighbors.map((n: any, i: any) => {
-                const href = safeUrl(n.url);
-                return (
-                  <div key={i} className="flex items-center gap-2 text-xs">
-                    <span className="text-foreground/70">{n.name}</span>
-                    <span className="text-muted-foreground">
-                      ({((n.similarity ?? 0) * 100).toFixed(0)}% similar)
+            <div>
+              <h5 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">
+                Similar Projects
+              </h5>
+              <div className="flex flex-wrap gap-2">
+                {sat.neighbors.map((n: { name: string; similarity: number; url: string }) => (
+                  <a
+                    key={n.name}
+                    href={n.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group/link inline-flex items-center gap-1.5 rounded-lg border border-border/40 bg-card/50 px-2.5 py-1.5 text-xs hover:border-primary/30 transition-colors"
+                  >
+                    <span>{n.name}</span>
+                    <span className="font-mono text-muted-foreground text-[10px]">
+                      {(n.similarity * 100).toFixed(0)}%
                     </span>
-                    {href && (
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        ↗
-                      </a>
-                    )}
-                  </div>
-                );
-              })}
+                    <ArrowUpRight className="h-3 w-3 text-muted-foreground/50 group-hover/link:text-primary transition-colors" />
+                  </a>
+                ))}
+              </div>
             </div>
           )}
 
+          {/* Pivot advice */}
           {idea.pivot && (
-            <div className="mt-2 border-t border-border pt-2">
-              <span className="text-xs font-medium text-amber-400">
-                Suggested Pivot:
-              </span>
-              <p className="text-xs text-muted-foreground">{idea.pivot}</p>
+            <div className="rounded-xl bg-primary/5 border border-primary/10 p-4">
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary mb-1.5">
+                <Zap className="h-3 w-3" />
+                Differentiation Advice
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{idea.pivot}</p>
             </div>
           )}
+
+          {/* Action pack CTA */}
+          <a
+            href={`/api/ideas/${idea.id}/action-pack.zip`}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-violet-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:brightness-110 transition-all"
+          >
+            <Download className="h-4 w-4" />
+            Download Action Pack
+          </a>
         </div>
       )}
     </Card>
   );
 }
+

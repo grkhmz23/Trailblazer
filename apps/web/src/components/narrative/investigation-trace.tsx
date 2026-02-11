@@ -1,9 +1,7 @@
-"use client";
-
-import { ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { toolIcon, formatDate } from "@/lib/utils";
+import { toolIcon } from "@/lib/utils";
+import { ExternalLink, Search, Code, Package, MessageCircle, Target } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Step {
   id: string;
@@ -15,92 +13,85 @@ interface Step {
   createdAt: string;
 }
 
-interface InvestigationTraceProps {
-  steps: Step[];
-}
-
-const toolLabels: Record<string, string> = {
-  repo_inspector: "Repository Inspector",
-  idl_differ: "IDL Differ",
-  dependency_tracker: "Dependency Tracker",
-  social_pain_finder: "Social Pain Finder",
-  competitor_search: "Competitor Search",
+const toolConfig: Record<string, { icon: typeof Search; label: string; color: string }> = {
+  repo_inspector: { icon: Search, label: "Repo Inspector", color: "text-sky-400 bg-sky-500/10" },
+  idl_differ: { icon: Code, label: "IDL Differ", color: "text-violet-400 bg-violet-500/10" },
+  dependency_tracker: { icon: Package, label: "Dependency Tracker", color: "text-amber-400 bg-amber-500/10" },
+  social_pain_finder: { icon: MessageCircle, label: "Social Pain Finder", color: "text-orange-400 bg-orange-500/10" },
+  competitor_search: { icon: Target, label: "Competitor Search", color: "text-emerald-400 bg-emerald-500/10" },
 };
 
-export function InvestigationTrace({ steps }: InvestigationTraceProps) {
+export function InvestigationTrace({ steps }: { steps: Step[] }) {
   if (steps.length === 0) {
     return (
-      <Card className="border-dashed">
-        <p className="text-center text-sm text-muted-foreground">
-          No investigation steps recorded for this narrative.
-        </p>
-      </Card>
+      <div className="rounded-xl border border-border/30 bg-card/30 p-8 text-center">
+        <p className="text-sm text-muted-foreground">No investigation steps recorded.</p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-0">
-      {steps
-        .sort((a: any, b: any) => a.stepIndex - b.stepIndex)
-        .map((step: any, i: any) => (
-          <div key={step.id} className="relative flex gap-4 pb-8 last:pb-0">
-            {/* Timeline connector */}
-            {i < steps.length - 1 && <div className="timeline-connector" />}
+    <div className="relative space-y-0 stagger">
+      {/* Vertical line */}
+      <div className="absolute left-[19px] top-6 bottom-6 w-px bg-gradient-to-b from-primary/40 via-primary/20 to-transparent" />
 
-            {/* Icon node */}
-            <div className="relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-border bg-card text-lg">
-              {toolIcon(step.tool)}
+      {steps.map((step, i) => {
+        const config = toolConfig[step.tool] ?? { icon: Search, label: step.tool, color: "text-zinc-400 bg-zinc-500/10" };
+        const Icon = config.icon;
+        const isLast = i === steps.length - 1;
+
+        return (
+          <div key={step.id} className="relative flex gap-4 pb-6 animate-fade-up">
+            {/* Node */}
+            <div className="relative z-10 flex flex-col items-center">
+              <div className={cn(
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-2 ring-background",
+                config.color
+              )}>
+                <Icon className="h-4 w-4" />
+              </div>
             </div>
 
             {/* Content */}
-            <div className="min-w-0 flex-1 pt-0.5">
-              <div className="mb-1 flex items-center gap-2">
-                <span className="text-sm font-semibold">
-                  {toolLabels[step.tool] ?? step.tool}
-                </span>
-                <Badge variant="secondary">Step {step.stepIndex + 1}</Badge>
-                <span className="text-xs text-muted-foreground">
-                  {formatDate(step.createdAt)}
-                </span>
-              </div>
-
-              {/* Input summary */}
-              <div className="mb-2 rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-                <span className="font-medium text-foreground/70">Input: </span>
-                {Object.entries(
-                  step.inputJson as Record<string, unknown>
-                )
-                  .map(
-                    ([k, v]) => `${k}=${typeof v === "string" ? v : JSON.stringify(v)}`
-                  )
-                  .join(", ")}
+            <Card className="flex-1 p-4 hover:border-border/50 transition-colors">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] text-muted-foreground bg-muted/30 px-1.5 py-0.5 rounded">
+                    Step {step.stepIndex + 1}
+                  </span>
+                  <span className="text-sm font-semibold">{config.label}</span>
+                </div>
               </div>
 
               {/* Output */}
-              <p className="text-sm leading-relaxed text-foreground/80">
-                {step.outputSummary}
-              </p>
+              {step.outputSummary && (
+                <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+                  {step.outputSummary}
+                </p>
+              )}
 
-              {/* Evidence links */}
-              {Array.isArray(step.linksJson) && step.linksJson.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {(step.linksJson as string[]).map((link: any, j: any) => (
+              {/* Links */}
+              {step.linksJson && step.linksJson.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {(step.linksJson as string[]).map((link, li) => (
                     <a
-                      key={j}
+                      key={li}
                       href={link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 transition-colors"
                     >
                       <ExternalLink className="h-3 w-3" />
-                      {new URL(link).hostname}
+                      Source {li + 1}
                     </a>
                   ))}
                 </div>
               )}
-            </div>
+            </Card>
           </div>
-        ))}
+        );
+      })}
     </div>
   );
 }
+
