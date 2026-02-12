@@ -11,7 +11,9 @@
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:push": "prisma db push",
     "seed": "tsx scripts/seed.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "pipeline:run": "tsx --tsconfig tsconfig.json -r tsconfig-paths/register src/scripts/run-pipeline.ts",
+    "pipeline:run:dry": "DEMO_MODE=true tsx --tsconfig tsconfig.json -r tsconfig-paths/register src/scripts/run-pipeline.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
@@ -38,7 +40,8 @@
     "postcss": "^8.4.38",
     "prisma": "^5.14.0",
     "tailwindcss": "^3.4.3",
-    "tsx": "^4.11.0",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.4.5"
   }
 }
