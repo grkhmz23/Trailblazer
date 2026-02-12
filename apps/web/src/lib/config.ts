@@ -29,7 +29,7 @@ export const config = {
 
   /** LLM — Moonshot Kimi */
   moonshotApiKey: env("MOONSHOT_API_KEY"),
-  moonshotModel: env("MOONSHOT_MODEL", "kimi-k2-turbo-preview"),
+  moonshotModel: env("MOONSHOT_MODEL", "kimi-k2-thinking-turbo"),
 
   /** Optional data source keys */
   heliusApiKey: env("HELIUS_API_KEY"),
