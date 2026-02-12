@@ -62,7 +62,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: pnpm --filter web exec prisma generate
+        run: pnpm --filter web exec npx prisma generate
 
       - name: Run pipeline
         run: |
