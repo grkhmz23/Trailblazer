@@ -21,7 +21,7 @@ import {
 } from "@/lib/llm/anthropic";
 
 const TOP_K = 20;
-const MAX_NARRATIVES = 7;
+const MAX_NARRATIVES = 10;
 
 interface PipelineResult {
   reportId: string;
