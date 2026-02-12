@@ -2,15 +2,9 @@
  * Node.js Lite Pipeline — runs the full narrative detection pipeline
  * in-process, without Python dependencies. Vercel-compatible.
  *
- * Steps:
- * 1. Ingest signals (fixtures or live)
- * 2. Score candidates
- * 3. Select top K
- * 4. Build embeddings + cluster into narratives
- * 5. Label narratives via LLM (or demo fallback)
- * 6. Generate ideas + action packs
- * 7. Run saturation checks
- * 8. Persist to database
+ * Optimized: batched LLM calls (label+ideas in 1 call, action packs in 1 call per narrative).
+ * Total LLM calls: ~20 (10 label+ideas + 10 action pack batches) instead of ~70.
+ * With concurrency 3: completes LLM phase in ~60s.
  */
 
 import { prisma } from "@/lib/prisma";
@@ -22,9 +16,8 @@ import {
   simpleTextEmbed,
 } from "./clustering";
 import {
-  labelNarrative,
-  generateIdeas,
-  generateActionPack,
+  labelNarrativeWithIdeas,
+  generateActionPackBatch,
 } from "@/lib/llm/anthropic";
 
 const TOP_K = 20;
@@ -44,7 +37,7 @@ function pLimit(concurrency: number) {
   let active = 0;
 
   function next() {
-    if (queue.length > 0 && active < concurrency) {
+    while (queue.length > 0 && active < concurrency) {
       active++;
       const fn = queue.shift()!;
       fn();
@@ -69,7 +62,7 @@ export async function runPipeline(
   periodEnd?: Date
 ): Promise<PipelineResult> {
   const startTime = Date.now();
-  const limit = pLimit(2); // max 2 concurrent LLM calls
+  const limit = pLimit(3); // 3 concurrent LLM calls
 
   const pEnd = periodEnd ?? new Date();
   const pStart =
@@ -137,7 +130,7 @@ export async function runPipeline(
     },
   });
 
-  // Create entities + candidates in parallel batches
+  // Create entities + candidates in parallel
   await Promise.all(
     topK.map(async (candidate) => {
       const entity = await prisma.entity.upsert({
@@ -176,12 +169,12 @@ export async function runPipeline(
     })
   );
 
-  // Step 6: Process clusters → narratives (parallelize LLM calls)
+  // Step 6: Process clusters → narratives
   console.log("[Pipeline] Step 6: Generating narratives...");
   const corpus = loadProjectCorpus();
   const clustersToProcess = clusters.slice(0, MAX_NARRATIVES);
 
-  // Phase A: Label all narratives in parallel (with concurrency limit)
+  // Prepare cluster data
   const clusterData = clustersToProcess.map((cluster) => {
     const members = cluster.memberIndices.map((i) => topK[i]);
     const clusterDocs = members.map((m) => {
@@ -196,33 +189,30 @@ export async function runPipeline(
     return { members, clusterDocs };
   });
 
-  console.log(`[Pipeline]   Labeling ${clusterData.length} clusters...`);
-  const labels = await Promise.all(
-    clusterData.map((cd) => limit(() => labelNarrative(cd.clusterDocs)))
+  // Phase A: Label + Ideas in parallel (1 LLM call per cluster, concurrency 3)
+  console.log(`[Pipeline]   Phase A: ${clusterData.length} clusters → label + ideas (batched)...`);
+  const labelIdeasResults = await Promise.all(
+    clusterData.map((cd) => limit(() => labelNarrativeWithIdeas(cd.clusterDocs)))
   );
+  console.log(`[Pipeline]   Phase A complete: ${labelIdeasResults.length} labels + idea sets`);
 
-  // Phase B: Generate ideas for all narratives in parallel
-  console.log(`[Pipeline]   Generating ideas...`);
-  const allIdeas = await Promise.all(
-    labels.map((label) =>
-      limit(() =>
-        generateIdeas({
-          title: label.title,
-          summary: label.summary,
-          evidence: label.evidenceHints,
-        })
-      )
+  // Phase B: Action packs in parallel (1 LLM call per narrative, concurrency 3)
+  console.log(`[Pipeline]   Phase B: Generating action packs (batched)...`);
+  const actionPackResults = await Promise.all(
+    labelIdeasResults.map(({ label, ideas }) =>
+      limit(() => generateActionPackBatch(ideas, label.title))
     )
   );
+  console.log(`[Pipeline]   Phase B complete: ${actionPackResults.length} action pack batches`);
 
-  // Phase C: Persist everything to DB (sequential DB writes, but no more LLM calls)
-  console.log(`[Pipeline]   Persisting to database...`);
+  // Phase C: Persist to database (no more LLM calls)
+  console.log(`[Pipeline]   Phase C: Persisting to database...`);
   let narrativeCount = 0;
 
   for (let ci = 0; ci < clusterData.length; ci++) {
     const { members } = clusterData[ci];
-    const label = labels[ci];
-    const ideas = allIdeas[ci];
+    const { label, ideas } = labelIdeasResults[ci];
+    const actionPacks = actionPackResults[ci];
     if (!members.length) continue;
 
     const avgMomentum =
@@ -242,7 +232,7 @@ export async function runPipeline(
       },
     });
 
-    // Investigation steps
+    // Investigation steps (parallel DB writes)
     const tools = [
       "repo_inspector",
       "dependency_tracker",
@@ -272,7 +262,7 @@ export async function runPipeline(
       })
     );
 
-    // Evidence
+    // Evidence (parallel DB writes)
     const evidenceCreates: Promise<unknown>[] = [];
     for (const member of members) {
       const topFeatures = Object.entries(member.features)
@@ -309,10 +299,10 @@ export async function runPipeline(
     }
     await Promise.all(evidenceCreates);
 
-    // Ideas + action packs (use demo action packs to avoid extra LLM calls)
+    // Ideas + action packs (parallel DB writes)
     let narrativeSaturation = 0;
     await Promise.all(
-      ideas.map(async (idea) => {
+      ideas.map(async (idea, idx) => {
         const ideaEmb = simpleTextEmbed(`${idea.title} ${idea.pitch}`);
         const sat = corpus.embeddings.length > 0
           ? computeSaturation(ideaEmb, corpus.embeddings, corpus.meta)
@@ -320,9 +310,7 @@ export async function runPipeline(
 
         narrativeSaturation = Math.max(narrativeSaturation, sat.score);
 
-        // Use demo action pack (template) to stay within timeout
-        const actionPack = await generateActionPack(idea, label.title);
-
+        const actionPack = actionPacks[idx] ?? actionPacks[0];
         const pivot =
           sat.level === "high"
             ? `Consider narrowing focus to a niche within ${idea.title} that existing competitors don't serve well.`
