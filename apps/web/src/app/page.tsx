@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDateRange, formatDate } from "@/lib/utils";
-import { Calendar, BarChart3, Clock, Zap, TrendingUp, Sparkles, Target, Activity } from "lucide-react";
+import { Calendar, Hash, Clock, Zap, ArrowUpRight, Wrench, Target, Layers } from "lucide-react";
 import Link from "next/link";
 import { HomeControls } from "@/components/dashboard/home-controls";
 
@@ -93,10 +93,10 @@ export default async function HomePage() {
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-fade-up" style={{ animationDelay: "80ms" }}>
         {[
-          { label: "Narratives", value: report.narratives.length, icon: BarChart3, color: "text-primary", glow: "card-glow-primary" },
-          { label: "Evidence", value: totalEvidence, icon: Activity, color: "text-emerald-400", glow: "card-glow-emerald" },
-          { label: "Build Ideas", value: totalIdeas, icon: Sparkles, color: "text-amber-400", glow: "card-glow-amber" },
-          { label: "Avg Momentum", value: `${(avgMomentum * 100).toFixed(0)}%`, icon: TrendingUp, color: "text-cyan-400", glow: "card-glow-cyan" },
+          { label: "Narratives", value: report.narratives.length, icon: Hash, color: "text-primary", glow: "card-glow-primary" },
+          { label: "Evidence", value: totalEvidence, icon: Layers, color: "text-emerald-400", glow: "card-glow-emerald" },
+          { label: "Build Ideas", value: totalIdeas, icon: Wrench, color: "text-amber-400", glow: "card-glow-amber" },
+          { label: "Avg Momentum", value: `${(avgMomentum * 100).toFixed(0)}%`, icon: ArrowUpRight, color: "text-cyan-400", glow: "card-glow-cyan" },
         ].map((stat) => (
           <Card key={stat.label} className={`p-4 bg-card/50 ${stat.glow}`}>
             <div className="flex items-center gap-3">
