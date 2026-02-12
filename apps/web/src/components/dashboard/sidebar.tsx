@@ -41,8 +41,8 @@ export function Sidebar() {
       {/* Brand */}
       <div>
         <Link href="/" className="flex items-center gap-3 px-2 mb-10">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15">
-            <Zap className="h-4 w-4 text-primary" />
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+            <img src="/logo.png" alt="Trailblazer" className="h-9 w-9 rounded-lg object-contain" />
             <div className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-background animate-glow-pulse" />
           </div>
           <div>
