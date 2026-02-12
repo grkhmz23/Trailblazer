@@ -33,15 +33,15 @@ export default async function ReportDetailPage({ params }: Props) {
     <div className="space-y-8">
       <Link
         href="/reports"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="h-3.5 w-3.5" />
         All reports
       </Link>
 
       {/* Header */}
       <div className="animate-fade-up">
-        <div className="flex items-center gap-3 mb-1">
+        <div className="flex items-center gap-3 mb-1.5">
           <h1 className="text-2xl font-bold tracking-tight">
             Fortnight Report
           </h1>
@@ -49,25 +49,28 @@ export default async function ReportDetailPage({ params }: Props) {
             {report.status}
           </Badge>
         </div>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-4 text-[13px] text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5" />
+            <Calendar className="h-3.5 w-3.5 opacity-60" />
             {formatDateRange(report.periodStart, report.periodEnd)}
           </span>
           <span className="flex items-center gap-1.5">
-            <BarChart3 className="h-3.5 w-3.5" />
+            <BarChart3 className="h-3.5 w-3.5 opacity-60" />
             {report.narratives.length} narratives
           </span>
           <span className="flex items-center gap-1.5">
-            <Users className="h-3.5 w-3.5" />
-            {report._count.candidates} candidates evaluated
+            <Users className="h-3.5 w-3.5 opacity-60" />
+            {report._count.candidates} candidates
           </span>
         </div>
       </div>
 
+      {/* Divider */}
+      <div className="section-divider" />
+
       {/* Narratives bento */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Detected Narratives</h2>
+        <h2 className="text-base font-semibold mb-4">Detected Narratives</h2>
         <div className="bento-grid stagger">
           {report.narratives.map((narrative: any, index: number) => (
             <NarrativeCard
@@ -89,4 +92,3 @@ export default async function ReportDetailPage({ params }: Props) {
     </div>
   );
 }
-

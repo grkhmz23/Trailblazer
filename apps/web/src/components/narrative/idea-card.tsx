@@ -37,52 +37,59 @@ export function IdeaCard({ idea }: { idea: IdeaData }) {
   const sat = idea.saturationJson;
 
   return (
-    <Card className={cn(
-      "overflow-hidden transition-all duration-300",
-      expanded && "ring-1 ring-primary/20 shadow-lg shadow-primary/5"
-    )}>
+    <Card
+      className={cn(
+        "overflow-hidden transition-all duration-300",
+        expanded && "ring-1 ring-primary/15"
+      )}
+    >
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex w-full items-start justify-between text-left gap-4"
       >
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 ring-1 ring-amber-500/20">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/8">
             <Lightbulb className="h-4 w-4 text-amber-400" />
           </div>
           <div>
             <h4 className="font-semibold text-sm leading-tight">{idea.title}</h4>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-2">{idea.pitch}</p>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-2">
+              {idea.pitch}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Badge className={saturationColor(sat.level)}>
-            {sat.level}
-          </Badge>
-          <ChevronDown className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform duration-200",
-            expanded && "rotate-180"
-          )} />
+          <Badge className={saturationColor(sat.level)}>{sat.level}</Badge>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 text-muted-foreground/50 transition-transform duration-200",
+              expanded && "rotate-180"
+            )}
+          />
         </div>
       </button>
 
-      {/* Expanded */}
+      {/* Expanded content */}
       {expanded && (
-        <div className="mt-5 space-y-5 border-t border-border/30 pt-5 animate-fade-in">
+        <div className="mt-5 space-y-5 border-t border-border/20 pt-5 animate-fade-in">
           {/* Detail grid */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {[
               { icon: Users, label: "Target User", value: idea.targetUser },
               { icon: Rocket, label: "MVP Scope", value: idea.mvpScope },
               { icon: Clock, label: "Why Now", value: idea.whyNow },
               { icon: Shield, label: "Validation", value: idea.validation },
             ].map((field) => (
-              <div key={field.label} className="rounded-lg bg-muted/20 border border-border/20 p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground mb-1.5">
+              <div
+                key={field.label}
+                className="rounded-lg bg-white/[0.02] border border-border/15 p-3"
+              >
+                <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-wider mb-1.5">
                   <field.icon className="h-3 w-3" />
                   {field.label}
                 </div>
-                <p className="text-sm leading-relaxed">{field.value}</p>
+                <p className="text-[13px] leading-relaxed">{field.value}</p>
               </div>
             ))}
           </div>
@@ -90,7 +97,7 @@ export function IdeaCard({ idea }: { idea: IdeaData }) {
           {/* Similar projects */}
           {sat.neighbors && sat.neighbors.length > 0 && (
             <div>
-              <h5 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">
+              <h5 className="text-[10px] font-semibold text-muted-foreground/70 uppercase tracking-widest mb-2">
                 Similar Projects
               </h5>
               <div className="flex flex-wrap gap-2">
@@ -100,13 +107,13 @@ export function IdeaCard({ idea }: { idea: IdeaData }) {
                     href={n.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group/link inline-flex items-center gap-1.5 rounded-lg border border-border/40 bg-card/50 px-2.5 py-1.5 text-xs hover:border-primary/30 transition-colors"
+                    className="group/link inline-flex items-center gap-1.5 rounded-md border border-border/30 bg-white/[0.02] px-2.5 py-1.5 text-xs hover:border-primary/20 transition-colors"
                   >
                     <span>{n.name}</span>
-                    <span className="font-mono text-muted-foreground text-[10px]">
+                    <span className="font-mono text-muted-foreground/60 text-[10px]">
                       {(n.similarity * 100).toFixed(0)}%
                     </span>
-                    <ArrowUpRight className="h-3 w-3 text-muted-foreground/50 group-hover/link:text-primary transition-colors" />
+                    <ArrowUpRight className="h-3 w-3 text-muted-foreground/30 group-hover/link:text-primary transition-colors" />
                   </a>
                 ))}
               </div>
@@ -115,21 +122,21 @@ export function IdeaCard({ idea }: { idea: IdeaData }) {
 
           {/* Pivot advice */}
           {idea.pivot && (
-            <div className="rounded-xl bg-primary/5 border border-primary/10 p-4">
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary mb-1.5">
+            <div className="rounded-lg bg-primary/4 border border-primary/10 p-4">
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider mb-1.5">
                 <Zap className="h-3 w-3" />
                 Differentiation Advice
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{idea.pivot}</p>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">{idea.pivot}</p>
             </div>
           )}
 
           {/* Action pack CTA */}
           <a
             href={`/api/ideas/${idea.id}/action-pack.zip`}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-violet-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:brightness-110 transition-all"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:brightness-110 transition-all"
           >
-            <Download className="h-4 w-4" />
+            <Download className="h-3.5 w-3.5" />
             Download Action Pack
           </a>
         </div>
@@ -137,4 +144,3 @@ export function IdeaCard({ idea }: { idea: IdeaData }) {
     </Card>
   );
 }
-

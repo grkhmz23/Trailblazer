@@ -3,7 +3,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/dashboard/sidebar";
 
 export const metadata: Metadata = {
-  title: "Narrative Hunter — Solana Ecosystem",
+  title: "Trailblazer — Solana Narrative Hunter",
   description:
     "AI-powered narrative detection for the Solana ecosystem. Discover emerging trends before they become obvious.",
 };
@@ -22,7 +22,7 @@ export default function RootLayout({
         <div className="relative flex min-h-screen">
           <Sidebar />
           <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
-            <div className="mx-auto max-w-6xl">
+            <div className="mx-auto max-w-5xl">
               {children}
             </div>
           </main>
@@ -31,4 +31,3 @@ export default function RootLayout({
     </html>
   );
 }
-

@@ -25,31 +25,25 @@ export default async function HomePage() {
   if (!report) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
-        <div className="max-w-lg text-center space-y-6">
-          {/* Animated logo */}
-          <div className="relative mx-auto w-20 h-20">
-            <div className="absolute inset-0 rounded-2xl bg-primary/20 animate-ping" style={{ animationDuration: "3s" }} />
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/30 to-violet-500/20 ring-1 ring-primary/30">
-              <Zap className="h-8 w-8 text-primary" />
+        <div className="max-w-md text-center space-y-6">
+          <div className="relative mx-auto w-16 h-16">
+            <div className="absolute inset-0 rounded-xl bg-primary/15 animate-ping" style={{ animationDuration: "3s" }} />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10">
+              <Zap className="h-6 w-6 text-primary" />
             </div>
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">No Reports Yet</h2>
+            <h2 className="text-xl font-semibold tracking-tight">No Reports Yet</h2>
             <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
-              Run the pipeline to generate your first fortnightly narrative report for the Solana ecosystem.
+              Run the pipeline to generate your first fortnightly narrative report.
             </p>
           </div>
 
           <Card className="text-left space-y-3 bg-card/40">
-            <p className="text-xs text-muted-foreground font-medium">Quick start:</p>
-            <code className="block rounded-lg bg-muted/30 border border-border/30 px-4 py-2.5 text-xs font-mono text-foreground">
+            <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Quick start</p>
+            <code className="block rounded-lg bg-black/20 border border-border/20 px-4 py-2.5 text-xs font-mono text-foreground">
               pnpm seed:demo
-            </code>
-            <p className="text-[11px] text-muted-foreground text-center">or trigger via API:</p>
-            <code className="block rounded-lg bg-muted/30 border border-border/30 px-4 py-2.5 text-xs font-mono text-foreground">
-              curl -X POST /api/admin/run-fortnight -H<br />
-              &quot;Authorization: Bearer $ADMIN_TOKEN&quot;
             </code>
           </Card>
         </div>
@@ -57,7 +51,6 @@ export default async function HomePage() {
     );
   }
 
-  // Compute aggregate stats
   const totalEvidence = report.narratives.reduce((sum: number, n: any) => sum + n.evidence.length, 0);
   const totalIdeas = report.narratives.reduce((sum: number, n: any) => sum + n.ideas.length, 0);
   const avgMomentum = report.narratives.length > 0
@@ -79,37 +72,35 @@ export default async function HomePage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="animate-fade-up">
-        <div className="flex flex-wrap items-center gap-3 mb-1">
+        <div className="flex flex-wrap items-center gap-3 mb-1.5">
           <h1 className="text-2xl font-bold tracking-tight">
-            Latest Fortnight Report
+            Latest Report
           </h1>
           <Badge variant="success">Live</Badge>
         </div>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-4 text-[13px] text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5" />
+            <Calendar className="h-3.5 w-3.5 opacity-60" />
             {formatDateRange(report.periodStart, report.periodEnd)}
           </span>
           <span className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5" />
+            <Clock className="h-3.5 w-3.5 opacity-60" />
             Generated {formatDate(report.createdAt)}
           </span>
         </div>
       </div>
 
-      {/* Stats bento */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-fade-up" style={{ animationDelay: "100ms" }}>
+      {/* Stats row */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-fade-up" style={{ animationDelay: "80ms" }}>
         {[
-          { label: "Narratives", value: report.narratives.length, icon: BarChart3, color: "text-primary", bg: "bg-primary/10" },
-          { label: "Evidence Points", value: totalEvidence, icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-          { label: "Build Ideas", value: totalIdeas, icon: Sparkles, color: "text-amber-400", bg: "bg-amber-500/10" },
-          { label: "Avg Momentum", value: `${(avgMomentum * 100).toFixed(0)}%`, icon: TrendingUp, color: "text-cyan-400", bg: "bg-cyan-500/10" },
+          { label: "Narratives", value: report.narratives.length, icon: BarChart3, color: "text-primary", glow: "card-glow-primary" },
+          { label: "Evidence", value: totalEvidence, icon: Activity, color: "text-emerald-400", glow: "card-glow-emerald" },
+          { label: "Build Ideas", value: totalIdeas, icon: Sparkles, color: "text-amber-400", glow: "card-glow-amber" },
+          { label: "Avg Momentum", value: `${(avgMomentum * 100).toFixed(0)}%`, icon: TrendingUp, color: "text-cyan-400", glow: "card-glow-cyan" },
         ].map((stat) => (
-          <Card key={stat.label} className="p-4 bg-card/40">
+          <Card key={stat.label} className={`p-4 bg-card/50 ${stat.glow}`}>
             <div className="flex items-center gap-3">
-              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${stat.bg}`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
+              <stat.icon className={`h-4 w-4 ${stat.color} opacity-60`} />
               <div>
                 <div className={`text-xl font-bold data-highlight ${stat.color}`}>{stat.value}</div>
                 <div className="text-[11px] text-muted-foreground">{stat.label}</div>
@@ -119,16 +110,19 @@ export default async function HomePage() {
         ))}
       </div>
 
-      {/* Narratives grid with controls */}
-      <div className="animate-fade-up" style={{ animationDelay: "200ms" }}>
+      {/* Divider */}
+      <div className="section-divider" />
+
+      {/* Narratives grid */}
+      <div className="animate-fade-up" style={{ animationDelay: "160ms" }}>
         <HomeControls narratives={narratives} />
       </div>
 
       {/* Footer */}
-      <div className="text-center pt-4 animate-fade-in" style={{ animationDelay: "400ms" }}>
+      <div className="text-center pt-2 animate-fade-in" style={{ animationDelay: "300ms" }}>
         <Link
           href="/reports"
-          className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          className="text-[13px] text-muted-foreground hover:text-primary transition-colors"
         >
           View all reports →
         </Link>
@@ -136,4 +130,3 @@ export default async function HomePage() {
     </div>
   );
 }
-

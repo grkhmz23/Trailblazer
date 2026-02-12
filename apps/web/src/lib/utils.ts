@@ -36,22 +36,7 @@ export function saturationColor(level: string): string {
   }
 }
 
-export function toolIcon(tool: string): string {
-  switch (tool) {
-    case "repo_inspector":
-      return "🔍";
-    case "idl_differ":
-      return "📐";
-    case "dependency_tracker":
-      return "📦";
-    case "social_pain_finder":
-      return "💬";
-    case "competitor_search":
-      return "🎯";
-    default:
-      return "🔧";
-  }
-}
+
 
 export function truncate(str: string, len: number): string {
   if (str.length <= len) return str;

@@ -4,7 +4,6 @@ import { InvestigationTrace } from "@/components/narrative/investigation-trace";
 import { EvidenceList } from "@/components/narrative/evidence-list";
 import { IdeaCard } from "@/components/narrative/idea-card";
 import { ScoreChip } from "@/components/ui/score-chip";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, FileText, Lightbulb, Brain, Search as SearchIcon } from "lucide-react";
 import Link from "next/link";
@@ -68,18 +67,18 @@ export default async function NarrativeDetailPage({ params }: Props) {
       {/* Back link */}
       <Link
         href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors animate-fade-in"
+        className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors animate-fade-in"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="h-3.5 w-3.5" />
         Back to report
       </Link>
 
       {/* Hero header */}
       <div className="animate-fade-up">
-        <h1 className="text-3xl font-bold tracking-tight mb-3">
+        <h1 className="text-2xl font-bold tracking-tight mb-3 max-w-3xl">
           {narrative.title}
         </h1>
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+        <p className="text-[13px] text-muted-foreground leading-relaxed max-w-3xl">
           {narrative.summary}
         </p>
 
@@ -88,28 +87,27 @@ export default async function NarrativeDetailPage({ params }: Props) {
           <ScoreChip label="Momentum" value={narrative.momentum} type="momentum" />
           <ScoreChip label="Novelty" value={narrative.novelty} type="novelty" />
           <ScoreChip label="Saturation" value={narrative.saturation} type="saturation" />
-          <span className="text-border mx-1">|</span>
+          <div className="h-4 w-px bg-border/30 mx-1 hidden sm:block" />
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <FileText className="h-3 w-3" />
-            {evidenceData.length} evidence points
+            <FileText className="h-3 w-3 opacity-60" />
+            {evidenceData.length} evidence
           </span>
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Lightbulb className="h-3 w-3" />
-            {ideasData.length} build ideas
+            <Lightbulb className="h-3 w-3 opacity-60" />
+            {ideasData.length} ideas
           </span>
         </div>
       </div>
 
       {/* Investigation Trace */}
       {steps.length > 0 && (
-        <section className="animate-fade-up" style={{ animationDelay: "100ms" }}>
+        <section className="animate-fade-up" style={{ animationDelay: "80ms" }}>
+          <div className="section-divider mb-8" />
           <div className="flex items-center gap-2.5 mb-5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
-              <Brain className="h-4 w-4 text-primary" />
-            </div>
+            <Brain className="h-4 w-4 text-primary" />
             <div>
-              <h2 className="text-lg font-semibold">Investigation Trace</h2>
-              <p className="text-xs text-muted-foreground">AI agent reasoning steps</p>
+              <h2 className="text-base font-semibold">Investigation Trace</h2>
+              <p className="text-[11px] text-muted-foreground">AI agent reasoning steps</p>
             </div>
           </div>
           <InvestigationTrace steps={steps} />
@@ -117,28 +115,26 @@ export default async function NarrativeDetailPage({ params }: Props) {
       )}
 
       {/* Evidence */}
-      <section className="animate-fade-up" style={{ animationDelay: "200ms" }}>
+      <section className="animate-fade-up" style={{ animationDelay: "160ms" }}>
+        <div className="section-divider mb-8" />
         <div className="flex items-center gap-2.5 mb-5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10">
-            <SearchIcon className="h-4 w-4 text-emerald-400" />
-          </div>
+          <SearchIcon className="h-4 w-4 text-emerald-400" />
           <div>
-            <h2 className="text-lg font-semibold">Evidence</h2>
-            <p className="text-xs text-muted-foreground">{evidenceData.length} signals from onchain, dev, and social data</p>
+            <h2 className="text-base font-semibold">Evidence</h2>
+            <p className="text-[11px] text-muted-foreground">{evidenceData.length} signals across onchain, dev, and social</p>
           </div>
         </div>
         <EvidenceList evidence={evidenceData} />
       </section>
 
       {/* Build Ideas */}
-      <section className="animate-fade-up" style={{ animationDelay: "300ms" }}>
+      <section className="animate-fade-up" style={{ animationDelay: "240ms" }}>
+        <div className="section-divider mb-8" />
         <div className="flex items-center gap-2.5 mb-5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10">
-            <Lightbulb className="h-4 w-4 text-amber-400" />
-          </div>
+          <Lightbulb className="h-4 w-4 text-amber-400" />
           <div>
-            <h2 className="text-lg font-semibold">Build Ideas</h2>
-            <p className="text-xs text-muted-foreground">{ideasData.length} actionable product ideas with saturation analysis</p>
+            <h2 className="text-base font-semibold">Build Ideas</h2>
+            <p className="text-[11px] text-muted-foreground">{ideasData.length} actionable ideas with saturation analysis</p>
           </div>
         </div>
         <div className="space-y-3">
@@ -150,4 +146,3 @@ export default async function NarrativeDetailPage({ params }: Props) {
     </div>
   );
 }
-

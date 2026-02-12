@@ -9,7 +9,7 @@ export function Card({ className, children, glow, ...props }: CardProps) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm p-5 transition-all duration-300",
+        "rounded-xl border border-border/40 bg-card/70 backdrop-blur-sm p-5 transition-all duration-300",
         glow && "glow-border",
         className
       )}
@@ -19,4 +19,3 @@ export function Card({ className, children, glow, ...props }: CardProps) {
     </div>
   );
 }
-
