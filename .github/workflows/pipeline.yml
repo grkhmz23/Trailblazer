@@ -23,7 +23,7 @@ env:
   MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
   MOONSHOT_MODEL: ${{ vars.MOONSHOT_MODEL || 'kimi-k2-turbo-preview' }}
   HELIUS_API_KEY: ${{ secrets.HELIUS_API_KEY }}
-  GITHUB_TOKEN_CUSTOM: ${{ secrets.GH_TOKEN_CUSTOM }}
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN_CUSTOM }}
   ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
   NODE_ENV: production
 
