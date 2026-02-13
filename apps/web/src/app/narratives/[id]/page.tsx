@@ -17,7 +17,9 @@ interface Props {
 }
 
 export default async function NarrativeDetailPage({ params }: Props) {
-  const narrative = await prisma.narrative.findUnique({
+  let narrative;
+  try {
+    narrative = await prisma.narrative.findUnique({
     where: { id: params.id },
     include: {
       evidence: true,
@@ -26,6 +28,18 @@ export default async function NarrativeDetailPage({ params }: Props) {
       report: true,
     },
   });
+
+  } catch (err) {
+    console.error("[Trailblazer] Failed to load narrative:", err);
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="text-center space-y-4">
+          <h2 className="text-xl font-semibold">Failed to Load</h2>
+          <p className="text-sm text-muted-foreground">Please try again shortly.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!narrative) return notFound();
 

@@ -35,9 +35,6 @@ export const config = {
   heliusApiKey: env("HELIUS_API_KEY"),
   heliusRpcUrl: env("HELIUS_RPC_URL"),
   githubToken: env("GITHUB_TOKEN"),
-  twitterBearerToken: env("TWITTER_BEARER_TOKEN"),
-  redditClientId: env("REDDIT_CLIENT_ID"),
-  redditClientSecret: env("REDDIT_CLIENT_SECRET"),
 
   /** Derived checks */
   get hasLlm(): boolean {

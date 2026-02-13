@@ -65,13 +65,24 @@ jobs:
         run: cd apps/web && npx prisma@5 generate
 
       - name: Run pipeline
+        env:
+          INPUT_START: ${{ github.event.inputs.period_start }}
+          INPUT_END: ${{ github.event.inputs.period_end }}
         run: |
           ARGS=""
-          if [ -n "${{ github.event.inputs.period_start }}" ]; then
-            ARGS="$ARGS --start ${{ github.event.inputs.period_start }}"
+          if [ -n "$INPUT_START" ]; then
+            if [[ ! "$INPUT_START" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+              echo "❌ Invalid period_start format (expected YYYY-MM-DD): $INPUT_START"
+              exit 1
+            fi
+            ARGS="$ARGS --start $INPUT_START"
           fi
-          if [ -n "${{ github.event.inputs.period_end }}" ]; then
-            ARGS="$ARGS --end ${{ github.event.inputs.period_end }}"
+          if [ -n "$INPUT_END" ]; then
+            if [[ ! "$INPUT_END" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+              echo "❌ Invalid period_end format (expected YYYY-MM-DD): $INPUT_END"
+              exit 1
+            fi
+            ARGS="$ARGS --end $INPUT_END"
           fi
           echo "Running pipeline with args: $ARGS"
           pnpm --filter web pipeline:run $ARGS

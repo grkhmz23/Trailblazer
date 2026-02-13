@@ -3,25 +3,31 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+const MAX_QUERY_LENGTH = 80;
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const q = searchParams.get("q")?.trim();
+    const raw = searchParams.get("q");
+    const q = raw?.trim().slice(0, MAX_QUERY_LENGTH);
 
-    if (!q) {
+    if (!q || q.length === 0) {
       return NextResponse.json(
-        { error: "Query parameter 'q' is required" },
+        { error: "Query parameter 'q' is required (max 80 chars)" },
         { status: 400 }
       );
     }
+
+    // Escape LIKE wildcards
+    const safeQ = q.replace(/%/g, "").replace(/_/g, "");
 
     const [entities, narratives] = await Promise.all([
       prisma.entity.findMany({
         where: {
           OR: [
-            { label: { contains: q, mode: "insensitive" } },
-            { key: { contains: q, mode: "insensitive" } },
-            { kind: { contains: q, mode: "insensitive" } },
+            { label: { contains: safeQ, mode: "insensitive" } },
+            { key: { contains: safeQ, mode: "insensitive" } },
+            { kind: { contains: safeQ, mode: "insensitive" } },
           ],
         },
         take: 20,
@@ -30,8 +36,8 @@ export async function GET(req: Request) {
       prisma.narrative.findMany({
         where: {
           OR: [
-            { title: { contains: q, mode: "insensitive" } },
-            { summary: { contains: q, mode: "insensitive" } },
+            { title: { contains: safeQ, mode: "insensitive" } },
+            { summary: { contains: safeQ, mode: "insensitive" } },
           ],
         },
         take: 10,

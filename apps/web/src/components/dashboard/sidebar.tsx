@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -44,7 +45,7 @@ export function Sidebar() {
       <div>
         <Link href="/" className="flex items-center gap-3 px-2 mb-10">
           <div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-            <img src="/logo.png" alt="Trailblazer" className="h-9 w-9 rounded-lg object-contain" />
+            <Image width={32} height={32} src="/logo.png" alt="Trailblazer" className="h-9 w-9 rounded-lg object-contain" />
             <div className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-background animate-glow-pulse" />
           </div>
           <div>

@@ -88,7 +88,6 @@ export const SOLANA_KOLS: Array<{ handle: string; label: string; category: KolCa
   { handle: "MessariCrypto", label: "Messari", category: "research" },
   { handle: "MulticoinCap", label: "Multicoin Capital", category: "research" },
   { handle: "KyleSamani", label: "Kyle Samani (Multicoin)", category: "research" },
-  { handle: "placeholdervc", label: "Placeholder VC", category: "research" },
   { handle: "cburniske", label: "Chris Burniske (Placeholder)", category: "research" },
   { handle: "JumpCrypto", label: "Jump Crypto", category: "research" },
   { handle: "dragonfly_xyz", label: "Dragonfly", category: "research" },

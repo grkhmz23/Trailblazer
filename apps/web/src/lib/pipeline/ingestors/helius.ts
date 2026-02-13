@@ -16,6 +16,10 @@ const HELIUS_RPC = config.heliusRpcUrl
     ? `https://mainnet.helius-rpc.com/?api-key=${config.heliusApiKey}`
     : "");
 
+function redactUrl(url: string): string {
+  return url.replace(/api-key=[^&]+/, "api-key=***");
+}
+
 const REQUEST_DELAY_MS = 100; // 200ms between requests to avoid rate limits
 const SIGNATURES_LIMIT = 200;
 const TX_SAMPLE_SIZE = 5;
@@ -41,7 +45,7 @@ async function rpcCall<T>(method: string, params: unknown[]): Promise<T> {
 
   clearTimeout(timeout);
   if (!res.ok) {
-    throw new Error(`Helius RPC ${res.status}: ${await res.text()}`);
+    throw new Error(`Helius RPC ${res.status}: request failed`);
   }
 
   const data = await res.json();
@@ -216,7 +220,7 @@ async function ingestProtocol(
       allBaselineSigs = allBaselineSigs.concat(baselineSigs);
       await sleep(REQUEST_DELAY_MS);
     } catch (e) {
-      console.warn(`[Helius] Error fetching ${protocol.key}/${programId}:`, e);
+      console.warn(`[Helius] Error fetching ${protocol.key}/${programId}:`, e instanceof Error ? e.message : String(e));
     }
   }
 
@@ -281,7 +285,7 @@ export async function ingestOnchainSignals(
         `[Helius]   ${protocol.label}: ${result.tx_count} txs (baseline: ${result.tx_count_baseline}), ~${result.unique_wallets} wallets`
       );
     } catch (e) {
-      console.error(`[Helius] Failed for ${protocol.key}:`, e);
+      console.error(`[Helius] Failed for ${protocol.key}:`, e instanceof Error ? e.message : String(e));
       results.push({
         entityKey: protocol.key,
         tx_count: 0,

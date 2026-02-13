@@ -3,6 +3,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/dashboard/sidebar";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://trailblazeragent.fun"),
   title: "Trailblazer — Solana Narrative Hunter",
   description:
     "AI-powered narrative detection for the Solana ecosystem. Discover emerging trends before they become obvious.",

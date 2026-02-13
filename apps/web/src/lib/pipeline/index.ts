@@ -18,7 +18,7 @@ import {
 import {
   labelNarrativeWithIdeas,
   generateActionPackBatch,
-} from "@/lib/llm/anthropic";
+} from "@/lib/llm/moonshot";
 
 const TOP_K = 20;
 const MAX_NARRATIVES = 10;
@@ -116,8 +116,21 @@ export async function runPipeline(
 
   // Step 5: Create report in DB
   console.log("[Pipeline] Step 5: Creating report...");
-  const report = await prisma.report.create({
-    data: {
+  // Dedup: upsert by unique (periodStart, periodEnd)
+  const report = await prisma.report.upsert({
+    where: {
+      periodStart_periodEnd: { periodStart: pStart, periodEnd: pEnd },
+    },
+    update: {
+      status: "processing",
+      configJson: {
+        mode: "node_lite",
+        top_k: TOP_K,
+        max_narratives: MAX_NARRATIVES,
+      },
+      hash: `lite_${Date.now().toString(36)}`,
+    },
+    create: {
       periodStart: pStart,
       periodEnd: pEnd,
       status: "processing",
@@ -129,6 +142,15 @@ export async function runPipeline(
       hash: `lite_${Date.now().toString(36)}`,
     },
   });
+
+  // If re-running, clean old data for this report
+  await prisma.idea.deleteMany({ where: { narrative: { reportId: report.id } } });
+  await prisma.narrativeEvidence.deleteMany({ where: { narrative: { reportId: report.id } } });
+  await prisma.investigationStep.deleteMany({ where: { narrative: { reportId: report.id } } });
+  await prisma.narrative.deleteMany({ where: { reportId: report.id } });
+  await prisma.candidate.deleteMany({ where: { reportId: report.id } });
+
+  try {
 
   // Create entities + candidates in parallel
   await Promise.all(
@@ -366,4 +388,14 @@ export async function runPipeline(
     candidateCount: topK.length,
     durationMs,
   };
+  } catch (pipelineError) {
+    // Mark report as failed on any crash
+    if (typeof report !== "undefined" && report?.id) {
+      await prisma.report.update({
+        where: { id: report.id },
+        data: { status: "failed" },
+      }).catch((e) => console.error("[Pipeline] Failed to mark report as failed:", e));
+    }
+    throw pipelineError;
+  }
 }

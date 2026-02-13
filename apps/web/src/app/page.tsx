@@ -11,7 +11,9 @@ import { IdeasPreview } from "@/components/dashboard/ideas-preview";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const report = await prisma.report.findFirst({
+  let report;
+  try {
+    report = await prisma.report.findFirst({
     where: { status: "complete" },
     orderBy: { createdAt: "desc" },
     include: {
@@ -24,6 +26,17 @@ export default async function HomePage() {
       },
     },
   });
+  } catch (err) {
+    console.error("[Trailblazer] Failed to load report:", err);
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="text-center space-y-4">
+          <h2 className="text-xl font-semibold">Service Temporarily Unavailable</h2>
+          <p className="text-sm text-muted-foreground">Unable to load dashboard data. Please try again shortly.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!report) {
     return (
