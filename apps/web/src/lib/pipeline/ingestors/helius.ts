@@ -25,7 +25,10 @@ async function sleep(ms: number): Promise<void> {
 }
 
 async function rpcCall<T>(method: string, params: unknown[]): Promise<T> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
   const res = await fetch(HELIUS_RPC, {
+    signal: controller.signal,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -36,6 +39,7 @@ async function rpcCall<T>(method: string, params: unknown[]): Promise<T> {
     }),
   });
 
+  clearTimeout(timeout);
   if (!res.ok) {
     throw new Error(`Helius RPC ${res.status}: ${await res.text()}`);
   }
