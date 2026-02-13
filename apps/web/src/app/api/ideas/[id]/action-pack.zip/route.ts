@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import archiver from "archiver";
-import { PassThrough } from "stream";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Sanitize folder/file names to prevent zip-slip and invalid chars */
 function sanitizeName(name: string): string {
   return name
     .toLowerCase()
-    .replace(/\.\./g, "") // prevent path traversal
+    .replace(/\.\./g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 80);
@@ -43,33 +41,29 @@ export async function GET(
       );
     }
 
-    // Create zip in memory
-    const archive = archiver("zip", { zlib: { level: 9 } });
-    const passThrough = new PassThrough();
-    const chunks: Buffer[] = [];
-
-    passThrough.on("data", (chunk: Buffer) => chunks.push(chunk));
-
-    archive.pipe(passThrough);
-
     const folderName = sanitizeName(idea.title);
 
-    for (const [filename, content] of Object.entries(actionPackFiles)) {
-      if (typeof content === "string") {
-        const safeName = sanitizeName(
-          filename.replace(/\.[^.]+$/, "")
-        );
-        const ext = filename.includes(".") ? filename.slice(filename.lastIndexOf(".")) : "";
-        archive.append(content, { name: `${folderName}/${safeName}${ext}` });
+    // Collect zip into buffer using a Promise
+    const buffer = await new Promise<Buffer>((resolve, reject) => {
+      const archive = archiver("zip", { zlib: { level: 9 } });
+      const chunks: Buffer[] = [];
+
+      archive.on("data", (chunk: Buffer) => chunks.push(chunk));
+      archive.on("end", () => resolve(Buffer.concat(chunks)));
+      archive.on("error", reject);
+
+      for (const [filename, content] of Object.entries(actionPackFiles)) {
+        if (typeof content === "string") {
+          const safeName = sanitizeName(filename.replace(/\.[^.]+$/, ""));
+          const ext = filename.includes(".")
+            ? filename.slice(filename.lastIndexOf("."))
+            : "";
+          archive.append(content, { name: `${folderName}/${safeName}${ext}` });
+        }
       }
-    }
 
-    await archive.finalize();
-
-    // Wait for all chunks
-    await new Promise<void>((resolve) => passThrough.on("end", resolve));
-
-    const buffer = Buffer.concat(chunks);
+      archive.finalize();
+    });
 
     return new NextResponse(buffer, {
       headers: {
