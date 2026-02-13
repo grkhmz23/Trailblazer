@@ -16,9 +16,9 @@ const HELIUS_RPC = config.heliusRpcUrl
     ? `https://mainnet.helius-rpc.com/?api-key=${config.heliusApiKey}`
     : "");
 
-const REQUEST_DELAY_MS = 200; // 200ms between requests to avoid rate limits
-const SIGNATURES_LIMIT = 1000;
-const TX_SAMPLE_SIZE = 20;
+const REQUEST_DELAY_MS = 100; // 200ms between requests to avoid rate limits
+const SIGNATURES_LIMIT = 200;
+const TX_SAMPLE_SIZE = 5;
 
 async function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
@@ -68,7 +68,7 @@ async function getSignaturesInWindow(
   programId: string,
   afterTimestamp: number,
   beforeTimestamp: number,
-  maxSignatures = 2000
+  maxSignatures = 200
 ): Promise<SignatureInfo[]> {
   const allSigs: SignatureInfo[] = [];
   let lastSig: string | undefined;
