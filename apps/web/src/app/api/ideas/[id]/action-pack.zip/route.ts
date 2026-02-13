@@ -64,7 +64,7 @@ export async function GET(
       archive.finalize();
     });
 
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       headers: {
         "Content-Type": "application/zip",
         "Content-Disposition": "attachment; filename=\"" + folderName + "-action-pack.zip\"",
