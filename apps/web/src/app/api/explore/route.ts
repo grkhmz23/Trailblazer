@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 const MAX_QUERY_LENGTH = 80;
 
 export async function GET(req: Request) {
+  const ip = req.headers.get("x-forwarded-for") || "anon";
+  const rl = rateLimit("explore:" + ip, { maxRequests: 30, windowMs: 60000 });
+  if (!rl.ok) return rateLimitResponse(rl.retryAfterMs);
+
   try {
     const { searchParams } = new URL(req.url);
     const raw = searchParams.get("q");
@@ -18,7 +23,6 @@ export async function GET(req: Request) {
       );
     }
 
-    // Escape LIKE wildcards
     const safeQ = q.replace(/%/g, "").replace(/_/g, "");
 
     const [entities, narratives] = await Promise.all([

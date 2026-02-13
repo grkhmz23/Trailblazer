@@ -1,0 +1,48 @@
+name: CI Quality Gate
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  quality:
+    name: Lint + Typecheck + Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Get pnpm store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: cd apps/web && npx prisma@5 generate
+
+      - name: Lint
+        run: pnpm --filter web lint
+
+      - name: Typecheck
+        run: pnpm --filter web typecheck
+
+      - name: Build
+        run: pnpm --filter web build

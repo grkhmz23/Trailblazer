@@ -59,7 +59,7 @@ export function Sidebar() {
         </Link>
 
         {/* Nav */}
-        <nav className="space-y-0.5">
+        <nav aria-label="Main navigation" className="space-y-0.5">
           {navItems.map((item) => {
             const isActive =
               item.href === "/"

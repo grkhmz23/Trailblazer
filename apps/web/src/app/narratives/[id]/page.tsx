@@ -52,7 +52,7 @@ export default async function NarrativeDetailPage({ params }: Props) {
     id: s.id,
     stepIndex: s.stepIndex,
     tool: s.tool,
-    inputJson: s.inputJson as Record<string, unknown>,
+    inputJson: s.inputJson as any,
     outputSummary: s.outputSummary,
     linksJson: s.linksJson as string[],
     createdAt: new Date(s.createdAt).toISOString(),
@@ -64,7 +64,7 @@ export default async function NarrativeDetailPage({ params }: Props) {
     title: e.title,
     url: e.url,
     snippet: e.snippet,
-    metricsJson: e.metricsJson as Record<string, unknown>,
+    metricsJson: e.metricsJson as any,
   }));
 
   const ideasData = narrative.ideas.map((idea: any) => ({

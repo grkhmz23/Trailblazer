@@ -45,7 +45,7 @@ function loadFixture<T>(name: string): T {
 }
 
 interface RawFixture {
-  metadata?: Record<string, unknown>;
+  metadata?: any;
   entities: Array<{
     kind: string;
     key: string;
@@ -53,9 +53,9 @@ interface RawFixture {
     first_seen: string;
   }>;
   signals: {
-    onchain: Array<Record<string, unknown>>;
-    dev: Array<Record<string, unknown>>;
-    social: Array<Record<string, unknown>>;
+    onchain: Array<any>;
+    dev: Array<any>;
+    social: Array<any>;
   };
 }
 
@@ -85,7 +85,7 @@ function mergeFixtureSignals(raw: RawFixture): MergedSignal[] {
     const oc = onchainMap.get(ent.key) ?? {};
     const dv = devMap.get(ent.key) ?? {};
     const sc = socialMap.get(ent.key) ?? {};
-    const strip = (obj: Record<string, unknown>) => {
+    const strip = (obj: any) => {
       const { entity_key, ...rest } = obj;
       return rest;
     };
@@ -94,9 +94,9 @@ function mergeFixtureSignals(raw: RawFixture): MergedSignal[] {
       label: ent.label,
       kind: ent.kind,
       first_seen: ent.first_seen,
-      onchain: strip(oc as Record<string, unknown>) as MergedSignal["onchain"],
-      dev: strip(dv as Record<string, unknown>) as MergedSignal["dev"],
-      social: strip(sc as Record<string, unknown>) as MergedSignal["social"],
+      onchain: strip(oc as any) as MergedSignal["onchain"],
+      dev: strip(dv as any) as MergedSignal["dev"],
+      social: strip(sc as any) as MergedSignal["social"],
     };
   });
 }

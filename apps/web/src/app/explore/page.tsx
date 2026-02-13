@@ -68,7 +68,7 @@ export default function ExplorePage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          placeholder="Search by program address, repo name, keyword..."
+          aria-label="Search entities and narratives" placeholder="Search by program address, repo name, keyword..."
           className="w-full rounded-xl border border-border/30 bg-white/[0.02] py-3.5 pl-11 pr-5 text-sm placeholder:text-muted-foreground/40 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all"
         />
         {loading && (

@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const ip = req.headers.get("x-forwarded-for") || "anon";
+  const rl = rateLimit("latest:" + ip, { maxRequests: 60, windowMs: 60000 });
+  if (!rl.ok) return rateLimitResponse(rl.retryAfterMs);
+
   try {
     const report = await prisma.report.findFirst({
       where: { status: "complete" },
