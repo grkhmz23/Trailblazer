@@ -3,6 +3,12 @@ import { Card } from "@/components/ui/card";
 import { ScoreChip } from "@/components/ui/score-chip";
 import { ArrowUpRight, FileText, Lightbulb } from "lucide-react";
 import { cn, truncate } from "@/lib/utils";
+import {
+  opportunityScore,
+  opportunityColor,
+  getLifecycleStage,
+  lifecycleColor,
+} from "@/lib/scores";
 
 interface NarrativeCardProps {
   id: string;
@@ -40,75 +46,57 @@ export function NarrativeCard({
   index,
   totalCount = 10,
 }: NarrativeCardProps) {
-  const isHero = index === 0 && totalCount > 2;
   const span = getBentoSpan(index, totalCount);
+  const opp = opportunityScore(momentum, novelty, saturation);
+  const oppColor = opportunityColor(opp);
+  const stage = getLifecycleStage(momentum, saturation);
+  const stageStyle = lifecycleColor(stage);
 
   return (
     <Link href={`/narratives/${id}`} className={cn(span, "animate-fade-up")}>
       <Card
         glow
-        className={cn(
-          "group relative h-full cursor-pointer overflow-hidden transition-all duration-300 hover-lift",
-          "hover:border-primary/20",
-          isHero ? "p-6 lg:p-7" : "p-5"
-        )}
+        className="group relative h-full cursor-pointer overflow-hidden transition-all duration-300 hover-lift hover:border-primary/20 p-5"
       >
-        {/* Top row */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <span
-              className={cn(
-                "flex shrink-0 items-center justify-center rounded-md font-mono font-bold text-primary bg-primary/8",
-                isHero ? "h-8 w-8 text-sm" : "h-6 w-6 text-[11px]"
-              )}
-            >
-              {index + 1}
+        {/* Top row: opportunity + stage + metadata */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className={cn("text-lg font-bold data-highlight", oppColor)}>
+              {opp}
             </span>
-            <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <FileText className="h-3 w-3 opacity-60" />
-                {evidenceCount}
-              </span>
-              <span className="flex items-center gap-1">
-                <Lightbulb className="h-3 w-3 opacity-60" />
-                {ideaCount}
-              </span>
-            </div>
+            <span className={cn("text-[9px] font-semibold uppercase tracking-wider rounded-md border px-1.5 py-0.5", stageStyle)}>
+              {stage}
+            </span>
           </div>
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground/30 transition-all duration-300 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <FileText className="h-3 w-3 opacity-60" />
+              {evidenceCount}
+            </span>
+            <span className="flex items-center gap-1">
+              <Lightbulb className="h-3 w-3 opacity-60" />
+              {ideaCount}
+            </span>
+            <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground/30 transition-all duration-300 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </div>
         </div>
 
         {/* Title */}
-        <h3
-          className={cn(
-            "font-semibold tracking-tight leading-snug transition-colors group-hover:text-primary",
-            isHero ? "text-lg mb-2" : "text-sm mb-1.5"
-          )}
-        >
+        <h3 className="text-sm font-semibold tracking-tight leading-snug transition-colors group-hover:text-primary mb-1.5">
           {title}
         </h3>
 
         {/* Summary */}
-        <p
-          className={cn(
-            "text-muted-foreground leading-relaxed",
-            isHero ? "text-[13px] mb-5 line-clamp-3" : "text-xs mb-4 line-clamp-2"
-          )}
-        >
-          {truncate(summary, isHero ? 280 : 150)}
+        <p className="text-xs text-muted-foreground leading-relaxed mb-3 line-clamp-2">
+          {truncate(summary, 180)}
         </p>
 
-        {/* Scores */}
-        <div className={cn("flex flex-wrap gap-2", isHero ? "gap-2.5" : "gap-1.5")}>
-          <ScoreChip label="Momentum" value={momentum} type="momentum" size={isHero ? "md" : "sm"} />
-          <ScoreChip label="Novelty" value={novelty} type="novelty" size={isHero ? "md" : "sm"} />
-          <ScoreChip label="Saturation" value={saturation} type="saturation" size={isHero ? "md" : "sm"} />
+        {/* Score chips — human labels */}
+        <div className="flex flex-wrap gap-1.5">
+          <ScoreChip label="Momentum" value={momentum} type="momentum" size="sm" showHuman />
+          <ScoreChip label="Novelty" value={novelty} type="novelty" size="sm" showHuman />
+          <ScoreChip label="Saturation" value={saturation} type="saturation" size="sm" showHuman />
         </div>
-
-        {/* Hero decorative element */}
-        {isHero && (
-          <div className="absolute -bottom-24 -right-24 h-48 w-48 rounded-full bg-primary/3 blur-3xl pointer-events-none" />
-        )}
       </Card>
     </Link>
   );

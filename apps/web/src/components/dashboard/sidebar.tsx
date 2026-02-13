@@ -9,6 +9,7 @@ import {
   Search,
   BookOpen,
   Zap,
+  Lightbulb,
   Activity,
   GitBranch,
   Twitter,
@@ -19,7 +20,8 @@ import {
 import { useState } from "react";
 
 const navItems = [
-  { href: "/", label: "Latest Report", icon: Zap },
+  { href: "/", label: "Dashboard", icon: Zap },
+  { href: "/ideas", label: "Build Ideas", icon: Lightbulb },
   { href: "/reports", label: "All Reports", icon: FileText },
   { href: "/explore", label: "Explore", icon: Search },
   { href: "/methodology", label: "Methodology", icon: BookOpen },

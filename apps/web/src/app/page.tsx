@@ -2,9 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDateRange, formatDate } from "@/lib/utils";
-import { Calendar, Hash, Clock, Zap, ArrowUpRight, Wrench, Target, Layers } from "lucide-react";
+import { Calendar, Clock, Zap } from "lucide-react";
 import Link from "next/link";
 import { HomeControls } from "@/components/dashboard/home-controls";
+import { DecisionStrip } from "@/components/dashboard/decision-strip";
+import { IdeasPreview } from "@/components/dashboard/ideas-preview";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +20,7 @@ export default async function HomePage() {
           evidence: true,
           ideas: true,
         },
+        orderBy: { momentum: "desc" },
       },
     },
   });
@@ -32,14 +35,12 @@ export default async function HomePage() {
               <Zap className="h-6 w-6 text-primary" />
             </div>
           </div>
-
           <div>
             <h2 className="text-xl font-semibold tracking-tight">No Reports Yet</h2>
             <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
               Run the pipeline to generate your first fortnightly narrative report.
             </p>
           </div>
-
           <Card className="text-left space-y-3 bg-card/40">
             <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Quick start</p>
             <code className="block rounded-lg bg-black/20 border border-border/20 px-4 py-2.5 text-xs font-mono text-foreground">
@@ -51,11 +52,7 @@ export default async function HomePage() {
     );
   }
 
-  const totalEvidence = report.narratives.reduce((sum: number, n: any) => sum + n.evidence.length, 0);
-  const totalIdeas = report.narratives.reduce((sum: number, n: any) => sum + n.ideas.length, 0);
-  const avgMomentum = report.narratives.length > 0
-    ? report.narratives.reduce((sum: number, n: any) => sum + n.momentum, 0) / report.narratives.length
-    : 0;
+  const topNarrative = report.narratives[0];
 
   const narratives = report.narratives.map((n: any) => ({
     id: n.id,
@@ -68,63 +65,86 @@ export default async function HomePage() {
     ideaCount: n.ideas.length,
   }));
 
+  // Collect all ideas for preview
+  const allIdeas = report.narratives.flatMap((n: any) =>
+    n.ideas.map((idea: any) => ({
+      id: idea.id,
+      title: idea.title,
+      pitch: idea.pitch,
+      targetUser: idea.targetUser,
+      narrativeTitle: n.title,
+      narrativeId: n.id,
+      saturationLevel: ((idea.saturationJson as any)?.level) ?? "unknown",
+    }))
+  );
+
   return (
     <div className="space-y-8">
-      {/* Header */}
+      {/* Meta header */}
       <div className="animate-fade-up">
-        <div className="flex flex-wrap items-center gap-3 mb-1.5">
-          <h1 className="text-2xl font-bold tracking-tight">
-            Latest Report
-          </h1>
-          <Badge variant="success">Live</Badge>
-        </div>
-        <div className="flex flex-wrap items-center gap-4 text-[13px] text-muted-foreground">
+        <p className="text-[13px] text-muted-foreground mb-1">
+          AI-detected emerging narratives in the Solana ecosystem — updated fortnightly from onchain, developer, and social data.
+        </p>
+        <div className="flex flex-wrap items-center gap-4 text-[12px] text-muted-foreground/60">
           <span className="flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5 opacity-60" />
+            <Calendar className="h-3 w-3" />
             {formatDateRange(report.periodStart, report.periodEnd)}
           </span>
           <span className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 opacity-60" />
+            <Clock className="h-3 w-3" />
             Generated {formatDate(report.createdAt)}
           </span>
+          <Badge variant="success">Live</Badge>
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 animate-fade-up" style={{ animationDelay: "80ms" }}>
-        {[
-          { label: "Narratives", value: report.narratives.length, icon: Hash, color: "text-primary", glow: "card-glow-primary" },
-          { label: "Evidence", value: totalEvidence, icon: Layers, color: "text-emerald-400", glow: "card-glow-emerald" },
-          { label: "Build Ideas", value: totalIdeas, icon: Wrench, color: "text-amber-400", glow: "card-glow-amber" },
-          { label: "Avg Momentum", value: `${(avgMomentum * 100).toFixed(0)}%`, icon: ArrowUpRight, color: "text-cyan-400", glow: "card-glow-cyan" },
-        ].map((stat) => (
-          <Card key={stat.label} className={`p-4 bg-card/50 ${stat.glow}`}>
-            <div className="flex items-center gap-3">
-              <stat.icon className={`h-4 w-4 ${stat.color} opacity-60`} />
-              <div>
-                <div className={`text-xl font-bold data-highlight ${stat.color}`}>{stat.value}</div>
-                <div className="text-[11px] text-muted-foreground">{stat.label}</div>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+      {/* Decision Strip — top signal */}
+      {topNarrative && (
+        <div className="animate-fade-up" style={{ animationDelay: "60ms" }}>
+          <DecisionStrip
+            narrative={{
+              id: topNarrative.id,
+              title: topNarrative.title,
+              summary: topNarrative.summary,
+              momentum: topNarrative.momentum,
+              novelty: topNarrative.novelty,
+              saturation: topNarrative.saturation,
+              ideaCount: topNarrative.ideas.length,
+            }}
+            firstIdeaId={topNarrative.ideas[0]?.id}
+          />
+        </div>
+      )}
 
-      {/* Divider */}
-      <div className="section-divider" />
+      {/* All Narratives */}
+      {narratives.length > 1 && (
+        <div className="animate-fade-up" style={{ animationDelay: "120ms" }}>
+          <div className="section-divider mb-6" />
+          <HomeControls narratives={narratives} />
+        </div>
+      )}
 
-      {/* Narratives grid */}
-      <div className="animate-fade-up" style={{ animationDelay: "160ms" }}>
-        <HomeControls narratives={narratives} />
-      </div>
+      {/* Build Ideas preview */}
+      {allIdeas.length > 0 && (
+        <div className="animate-fade-up" style={{ animationDelay: "180ms" }}>
+          <div className="section-divider mb-6" />
+          <IdeasPreview ideas={allIdeas} />
+        </div>
+      )}
 
-      {/* Footer */}
-      <div className="text-center pt-2 animate-fade-in" style={{ animationDelay: "300ms" }}>
+      {/* Footer links */}
+      <div className="flex items-center justify-center gap-6 pt-2 animate-fade-in" style={{ animationDelay: "240ms" }}>
         <Link
           href="/reports"
-          className="text-[13px] text-muted-foreground hover:text-primary transition-colors"
+          className="text-[12px] text-muted-foreground hover:text-primary transition-colors"
         >
-          View all reports →
+          All reports →
+        </Link>
+        <Link
+          href="/methodology"
+          className="text-[12px] text-muted-foreground hover:text-primary transition-colors"
+        >
+          How it works →
         </Link>
       </div>
     </div>
