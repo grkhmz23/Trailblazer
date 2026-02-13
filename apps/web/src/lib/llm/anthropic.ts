@@ -35,7 +35,10 @@ async function callLLM(
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 180_000);
       const res = await fetch("https://api.moonshot.ai/v1/chat/completions", {
+        signal: controller.signal,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,6 +55,7 @@ async function callLLM(
         }),
       });
 
+      clearTimeout(timeout);
       if (res.status === 429 || res.status >= 500) {
         const delay = BASE_DELAY_MS * Math.pow(2, attempt);
         console.warn(
